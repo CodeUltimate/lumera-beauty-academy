@@ -1,0 +1,726 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&display=swap');
+
+:root {
+  /* Premium Color Palette - Matching Frontend */
+  --cream: #FAF8F5;
+  --cream-light: #FDFCFA;
+  --beige: #F5F0E8;
+  --champagne: #C9A962;
+  --champagne-light: #D4BA7A;
+  --champagne-dark: #B8953F;
+  --plum: #3D2C3A;
+  --plum-light: #5A4456;
+  --charcoal: #2C2C2C;
+  --charcoal-light: #4A4A4A;
+  --white: #FFFFFF;
+  --text-primary: #2C2C2C;
+  --text-secondary: #6B6B6B;
+  --text-muted: #9B9B9B;
+  --border: #E8E4DE;
+  --border-light: #F0ECE6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--cream-light);
+  color: var(--text-primary);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Main container - Split screen layout */
+.lumera-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Left side - Form area */
+.lumera-form-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+/* Card styling */
+.lumera-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 0;
+  background: transparent;
+}
+
+/* Logo and branding */
+.lumera-header {
+  margin-bottom: 3rem;
+}
+
+.lumera-logo {
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--charcoal);
+  margin-bottom: 0.25rem;
+}
+
+.lumera-subtitle {
+  font-size: 0.65rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Welcome copy */
+.lumera-copy {
+  margin-bottom: 2rem;
+}
+
+.lumera-copy h1 {
+  font-size: 1.875rem;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--charcoal);
+  margin: 0 0 0.5rem 0;
+}
+
+.lumera-copy p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-weight: 300;
+  font-size: 1rem;
+}
+
+/* Form field styling */
+.lumera-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.lumera-field label {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.lumera-field input {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.875rem 1rem;
+  color: var(--text-primary);
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 300;
+  transition: all 0.3s ease;
+}
+
+.lumera-field input:focus {
+  outline: none;
+  border-color: var(--champagne);
+  box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+}
+
+.lumera-field input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Actions row - Forgot password */
+.lumera-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0.5rem 0 1.5rem;
+  font-size: 0.875rem;
+}
+
+.lumera-remember {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 300;
+  color: var(--text-secondary);
+}
+
+.checkbox input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--champagne);
+  cursor: pointer;
+}
+
+.lumera-forgot a {
+  color: var(--champagne);
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+.lumera-forgot a:hover {
+  color: var(--champagne-dark);
+  text-decoration: underline;
+}
+
+/* Primary Button */
+.lumera-btn {
+  display: block;
+  width: 100%;
+  padding: 0.875rem 2rem;
+  border-radius: 2px;
+  border: none;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lumera-btn.primary {
+  background: linear-gradient(135deg, var(--champagne) 0%, var(--champagne-dark) 100%);
+  color: var(--white);
+  box-shadow: none;
+}
+
+.lumera-btn.primary:hover {
+  background: linear-gradient(135deg, var(--champagne-light) 0%, var(--champagne) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(201, 169, 98, 0.3);
+}
+
+.lumera-btn.primary:active {
+  transform: translateY(0);
+}
+
+/* Ghost/Secondary Button */
+.lumera-btn.ghost {
+  background: transparent;
+  color: var(--charcoal);
+  border: 1px solid var(--border);
+}
+
+.lumera-btn.ghost:hover {
+  border-color: var(--champagne);
+  color: var(--champagne);
+}
+
+/* Divider */
+.lumera-divider {
+  margin: 1.5rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.lumera-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--border) 50%, transparent 100%);
+}
+
+.lumera-divider span {
+  position: relative;
+  background: var(--cream-light);
+  padding: 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+/* Alert/Error styling */
+.lumera-alert {
+  padding: 1rem;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.lumera-alert::before {
+  content: '⚠';
+  flex-shrink: 0;
+}
+
+.lumera-alert-error {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #B91C1C;
+}
+
+.lumera-alert-success {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+
+.lumera-alert-info {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.lumera-alert-info::before {
+  content: 'ℹ';
+}
+
+/* Meta text (Terms & Privacy) */
+.lumera-meta {
+  margin-top: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 300;
+}
+
+.lumera-meta a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.lumera-meta a:hover {
+  color: var(--champagne);
+}
+
+/* Right side - Hero/Branding panel */
+.lumera-hero-side {
+  flex: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: linear-gradient(135deg, var(--plum) 0%, var(--plum-light) 100%);
+}
+
+@media (min-width: 1024px) {
+  .lumera-hero-side {
+    display: flex;
+  }
+}
+
+.lumera-hero-content {
+  max-width: 480px;
+  text-align: center;
+}
+
+.lumera-hero-content h2 {
+  font-size: 2.5rem;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--white);
+  margin: 0 0 1.5rem 0;
+}
+
+.lumera-hero-content p {
+  font-size: 1.125rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.lumera-hero-stats {
+  margin-top: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  font-weight: 300;
+}
+
+.lumera-hero-stats span:not(.dot) {
+  white-space: nowrap;
+}
+
+.lumera-hero-stats .dot {
+  font-size: 0.5rem;
+}
+
+/* Register link section */
+.lumera-register-link {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+}
+
+.lumera-register-link a {
+  color: var(--champagne);
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.lumera-register-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 1023px) {
+  .lumera-form-side {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .lumera-card {
+    max-width: 100%;
+  }
+
+  .lumera-copy h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Utility classes for Keycloak compatibility */
+#kc-content-wrapper {
+  display: contents;
+}
+
+.kc-form-card {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Password visibility toggle if needed */
+.lumera-password-wrapper {
+  position: relative;
+}
+
+.lumera-password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+}
+
+.lumera-password-toggle:hover {
+  color: var(--champagne);
+}
+
+/* Social login buttons if enabled */
+.lumera-social {
+  margin-top: 1.5rem;
+}
+
+.lumera-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--white);
+  color: var(--text-primary);
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin-bottom: 0.75rem;
+}
+
+.lumera-social-btn:hover {
+  border-color: var(--champagne);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.lumera-social-btn img,
+.lumera-social-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Form validation states */
+.lumera-field.has-error input {
+  border-color: #DC2626;
+}
+
+.lumera-field .field-error {
+  color: #DC2626;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Loading state */
+.lumera-btn.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.lumera-btn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1rem;
+  height: 1rem;
+  margin: -0.5rem 0 0 -0.5rem;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--champagne);
+}
+
+/* ==========================================
+   REGISTER PAGE SPECIFIC STYLES
+   ========================================== */
+
+.lumera-register .lumera-hero-side {
+  order: -1;
+}
+
+.lumera-hero-gradient {
+  background: linear-gradient(135deg, var(--plum) 0%, var(--plum-light) 100%);
+}
+
+.lumera-hero-features {
+  margin-top: 3rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lumera-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 300;
+}
+
+.lumera-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--champagne);
+  font-size: 1rem;
+}
+
+.lumera-field-hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.lumera-terms-notice {
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.lumera-terms-notice a {
+  color: var(--champagne);
+  text-decoration: none;
+}
+
+.lumera-terms-notice a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================
+   FORGOT PASSWORD / RESET PAGES
+   ========================================== */
+
+.lumera-info-text {
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ==========================================
+   ERROR PAGE STYLES
+   ========================================== */
+
+.lumera-error-page {
+  text-align: center;
+  padding: 2rem;
+}
+
+.lumera-error-page h1 {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--charcoal);
+  margin-bottom: 1rem;
+}
+
+.lumera-error-page p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================
+   KEYCLOAK DEFAULT OVERRIDES
+   ========================================== */
+
+/* Override Keycloak v2 default styles */
+#kc-page-title {
+  display: none !important;
+}
+
+.login-pf body,
+#kc-content {
+  background: transparent !important;
+}
+
+#kc-form {
+  padding: 0 !important;
+}
+
+#kc-form-wrapper {
+  padding: 0 !important;
+}
+
+.card-pf {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+#kc-locale {
+  display: none;
+}
+
+/* Hide Keycloak branding */
+#kc-logo-wrapper,
+.kc-logo-text {
+  display: none !important;
+}
+
+/* Ensure form inputs inherit our styling */
+#kc-form-login input[type="text"],
+#kc-form-login input[type="password"],
+#kc-form-login input[type="email"],
+#kc-register-form input[type="text"],
+#kc-register-form input[type="password"],
+#kc-register-form input[type="email"] {
+  background: var(--white) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 2px !important;
+  padding: 0.875rem 1rem !important;
+  color: var(--text-primary) !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 300 !important;
+  width: 100% !important;
+  transition: all 0.3s ease !important;
+}
+
+#kc-form-login input:focus,
+#kc-register-form input:focus {
+  outline: none !important;
+  border-color: var(--champagne) !important;
+  box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1) !important;
+}
+
+/* Account pages styling */
+.lumera-account {
+  background: var(--cream-light);
+  min-height: 100vh;
+}
+
+/* Info/Warning messages styling */
+.kc-feedback-text {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.875rem;
+}
+
+/* Select dropdown styling */
+select {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.875rem 1rem;
+  color: var(--text-primary);
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 300;
+  width: 100%;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B6B6B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--champagne);
+  box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+}

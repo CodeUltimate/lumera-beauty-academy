@@ -1,26 +1,30 @@
 {
   "name": "lumera-beauty-academy",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "Luméra Beauty Academy - Premium Global Beauty Education Platform",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "frontend:dev": "npm run dev --workspace=services/frontend",
+    "frontend:build": "npm run build --workspace=services/frontend",
+    "frontend:start": "npm run start --workspace=services/frontend",
+    "backend:build": "cd services/backend && ./mvnw clean package -DskipTests",
+    "backend:run": "cd services/backend && ./mvnw spring-boot:run",
+    "backend:test": "cd services/backend && ./mvnw test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "docker:logs": "docker-compose logs -f",
+    "db:migrate": "cd services/backend && ./mvnw flyway:migrate",
+    "dev": "concurrently \"npm run frontend:dev\" \"npm run backend:run\"",
+    "build": "npm run frontend:build && npm run backend:build"
   },
-  "dependencies": {
-    "next": "16.0.4",
-    "react": "19.2.0",
-    "react-dom": "19.2.0"
-  },
+  "workspaces": [
+    "services/frontend"
+  ],
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.4",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

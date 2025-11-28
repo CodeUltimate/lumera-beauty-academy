@@ -1,36 +1,197 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Luméra Beauty Academy
+
+**Live. Learn. Elevate.**
+
+A premium global beauty education platform connecting beauty educators with students worldwide through live video
+classes, on-demand courses, and professional certifications.
+
+## Architecture
+
+This is a monorepo containing:
+
+```
+lumera-beauty-academy/
+├── services/
+│   ├── frontend/          # Next.js 16 React application
+│   └── backend/           # Spring Boot 3.2 Java API
+├── docker-compose.yml     # Local development orchestration
+└── package.json          # Root workspace configuration
+```
+
+## Tech Stack
+
+### Frontend
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State**: React Context (future: Zustand)
+
+### Backend
+
+- **Framework**: Spring Boot 3.2
+- **Language**: Java 21
+- **Database**: PostgreSQL 16
+- **Authentication**: JWT (JSON Web Tokens)
+- **API Documentation**: OpenAPI 3.0 / Swagger UI
+- **Migrations**: Flyway
+
+### Infrastructure
+
+- **Containerization**: Docker & Docker Compose
+- **Cache**: Redis (optional)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- Java 21+
+- Docker & Docker Compose
+- PostgreSQL 16 (or use Docker)
+
+### Quick Start with Docker
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Services will be available at:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8080/api
+- Swagger UI: http://localhost:8080/api/swagger-ui.html
+- Adminer (DB UI): http://localhost:8081
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Local Development
 
-## Learn More
+#### 1. Start the database
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+docker-compose up -d postgres
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### 2. Start the backend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+cd services/backend
+./mvnw spring-boot:run
+```
 
-## Deploy on Vercel
+#### 3. Start the frontend
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cd services/frontend
+npm install
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+cp .env.example .env
+```
+
+Key variables:
+
+- `DB_*` - Database connection settings
+- `JWT_SECRET` - JWT signing key (min 256 bits)
+- `CORS_ORIGINS` - Allowed frontend origins
+- `NEXT_PUBLIC_API_URL` - Backend API URL for frontend
+
+## API Endpoints
+
+### Authentication
+
+- `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - Login and get tokens
+
+### Categories
+
+- `GET /api/v1/categories` - List visible categories
+- `GET /api/v1/categories/{slug}` - Get category by slug
+
+### Live Classes
+
+- `GET /api/v1/classes` - List upcoming classes
+- `GET /api/v1/classes/live` - List currently live classes
+- `GET /api/v1/classes/{id}` - Get class details
+- `POST /api/v1/classes` - Create class (Educator)
+- `PUT /api/v1/classes/{id}` - Update class (Educator)
+
+### Protected Routes
+
+- `/api/v1/student/*` - Student-only endpoints
+- `/api/v1/educator/*` - Educator-only endpoints
+- `/api/v1/admin/*` - Admin-only endpoints
+
+## Database Schema
+
+Key entities:
+
+- **users** - Students, Educators, Admins
+- **categories** - Class categories (visible/hidden)
+- **live_classes** - Live video class sessions
+- **enrollments** - Student class enrollments
+- **certificates** - Completion certificates
+- **payout_records** - Educator payouts
+
+## Project Structure
+
+### Frontend (`services/frontend/`)
+
+```
+src/
+├── app/                 # Next.js App Router pages
+│   ├── (dashboard)/    # Dashboard layouts
+│   │   ├── student/
+│   │   ├── educator/
+│   │   └── admin/
+│   ├── classroom/      # Live classroom
+│   └── ...
+├── components/         # React components
+│   ├── dashboard/
+│   ├── layout/
+│   └── ui/
+├── data/              # Mock data & categories
+├── lib/               # Utilities
+└── types/             # TypeScript types
+```
+
+### Backend (`services/backend/`)
+
+```
+src/main/java/com/lumera/academy/
+├── config/            # Spring configuration
+├── controller/        # REST controllers
+├── dto/              # Data transfer objects
+├── entity/           # JPA entities
+├── exception/        # Exception handling
+├── repository/       # Data repositories
+├── security/         # JWT & Spring Security
+└── service/          # Business logic
+```
+
+## Scripts
+
+Root package.json commands:
+
+```bash
+npm run frontend:dev    # Start frontend dev server
+npm run frontend:build  # Build frontend for production
+npm run backend:run     # Start backend with Maven
+npm run backend:build   # Build backend JAR
+npm run docker:up       # Start all Docker services
+npm run docker:down     # Stop all Docker services
+npm run dev            # Start both frontend and backend
+```
+
+## License
+
+Proprietary - All rights reserved.

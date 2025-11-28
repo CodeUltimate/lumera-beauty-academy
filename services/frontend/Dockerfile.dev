@@ -1,0 +1,22 @@
+# Development Dockerfile with hot reloading
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy all config files needed for dev server
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY next.config.ts ./
+COPY postcss.config.mjs ./
+COPY eslint.config.mjs ./
+
+# Install dependencies
+RUN npm install
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=development
+ENV WATCHPACK_POLLING=true
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

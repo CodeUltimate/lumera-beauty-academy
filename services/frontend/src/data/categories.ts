@@ -1,0 +1,138 @@
+import { Category } from '@/types';
+
+export const categories: Category[] = [
+  // Visible Main Categories
+  {
+    id: 'skincare',
+    name: 'Skincare',
+    slug: 'skincare',
+    description: 'Advanced skincare techniques and treatments',
+    icon: 'Sparkles',
+    isVisible: true,
+    order: 1,
+  },
+  {
+    id: 'laser-devices',
+    name: 'Laser & Devices',
+    slug: 'laser-devices',
+    description: 'Laser treatments and advanced device training',
+    icon: 'Zap',
+    isVisible: true,
+    order: 2,
+  },
+  {
+    id: 'brow-lash',
+    name: 'Brow & Lash',
+    slug: 'brow-lash',
+    description: 'Eyebrow and eyelash enhancement techniques',
+    icon: 'Eye',
+    isVisible: true,
+    order: 3,
+  },
+  {
+    id: 'pmu',
+    name: 'PMU',
+    slug: 'pmu',
+    description: 'Permanent makeup artistry and techniques',
+    icon: 'Pen',
+    isVisible: true,
+    order: 4,
+  },
+  {
+    id: 'aesthetics-needle',
+    name: 'Aesthetics (Needle)',
+    slug: 'aesthetics-needle',
+    description: 'Injectable treatments and dermal fillers',
+    icon: 'Syringe',
+    isVisible: true,
+    order: 5,
+  },
+  {
+    id: 'needle-free-aesthetics',
+    name: 'Needle-Free Aesthetics',
+    slug: 'needle-free-aesthetics',
+    description: 'Non-invasive aesthetic treatments',
+    icon: 'Wand2',
+    isVisible: true,
+    order: 6,
+  },
+  {
+    id: 'beauty-business',
+    name: 'Beauty Business & Marketing',
+    slug: 'beauty-business',
+    description: 'Business strategies and marketing for beauty professionals',
+    icon: 'TrendingUp',
+    isVisible: true,
+    order: 7,
+  },
+
+  // Hidden Categories (Admin-activated)
+  {
+    id: 'nails',
+    name: 'Nails',
+    slug: 'nails',
+    description: 'Nail art and manicure techniques',
+    icon: 'Gem',
+    isVisible: false,
+    order: 8,
+  },
+  {
+    id: 'hair',
+    name: 'Hair / Hairdressing',
+    slug: 'hair',
+    description: 'Hair styling and treatment techniques',
+    icon: 'Scissors',
+    isVisible: false,
+    order: 9,
+  },
+  {
+    id: 'makeup',
+    name: 'Makeup',
+    slug: 'makeup',
+    description: 'Professional makeup artistry',
+    icon: 'Palette',
+    isVisible: false,
+    order: 10,
+  },
+  {
+    id: 'spa-wellness',
+    name: 'Spa & Wellness',
+    slug: 'spa-wellness',
+    description: 'Spa treatments and wellness therapies',
+    icon: 'Leaf',
+    isVisible: false,
+    order: 11,
+  },
+  {
+    id: 'cosmetic-science',
+    name: 'Cosmetic Science / Dermatology',
+    slug: 'cosmetic-science',
+    description: 'Scientific approach to skincare and cosmetics',
+    icon: 'FlaskConical',
+    isVisible: false,
+    order: 12,
+  },
+  {
+    id: 'body-care',
+    name: 'Body Care',
+    slug: 'body-care',
+    description: 'Body treatments and contouring',
+    icon: 'Heart',
+    isVisible: false,
+    order: 13,
+  },
+  {
+    id: 'massage-therapy',
+    name: 'Massage Therapy',
+    slug: 'massage-therapy',
+    description: 'Professional massage techniques',
+    icon: 'Hand',
+    isVisible: false,
+    order: 14,
+  },
+];
+
+export const getVisibleCategories = () => categories.filter((c) => c.isVisible);
+export const getAllCategories = () => categories;
+export const getCategoryById = (id: string) => categories.find((c) => c.id === id);
+export const getCategoryBySlug = (slug: string) => categories.find((c) => c.slug === slug);

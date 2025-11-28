@@ -1,0 +1,182 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: lumera-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lumera
+      POSTGRES_USER: lumera
+      POSTGRES_PASSWORD: lumera
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U lumera -d lumera" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lumera-network
+
+  # Keycloak PostgreSQL Database
+  keycloak-db:
+    image: postgres:16-alpine
+    container_name: lumera-keycloak-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak -d keycloak" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lumera-network
+
+  # Keycloak Identity Provider
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: lumera-keycloak
+    restart: unless-stopped
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8180
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    entrypoint: [ "/bin/sh", "/opt/keycloak/data/import/entrypoint.sh" ]
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./infra/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+      - ./infra/keycloak/entrypoint.sh:/opt/keycloak/data/import/entrypoint.sh:ro
+      - ./infra/keycloak/theme/lumera:/opt/keycloak/themes/lumera:ro
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - lumera-network
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./services/backend
+      dockerfile: Dockerfile
+    container_name: lumera-backend
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=lumera
+      - DB_USERNAME=lumera
+      - DB_PASSWORD=lumera
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_EXTERNAL_URL=http://localhost:8180
+      - KEYCLOAK_REALM=lumera
+      - KEYCLOAK_CLIENT_ID=lumera-backend
+      - KEYCLOAK_CLIENT_SECRET=backend-secret
+      - KEYCLOAK_FRONTEND_CLIENT_ID=lumera-frontend
+      - KEYCLOAK_REDIRECT_URI=http://localhost:8080/api/v1/auth/callback
+      - CORS_ORIGINS=http://localhost:3000
+      - APP_AUTH_COOKIE_SECURE=false
+      - APP_AUTH_COOKIE_SAMESITE=Lax
+      - MAIL_HOST=maildev
+      - MAIL_PORT=1025
+      - APP_FRONTEND_URL=http://localhost:3000
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - lumera-network
+
+  # Next.js Frontend (Development with hot reload)
+  frontend:
+    build:
+      context: ./services/frontend
+      dockerfile: Dockerfile.dev
+    container_name: lumera-frontend
+    restart: unless-stopped
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+      - NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8180
+      - NEXT_PUBLIC_KEYCLOAK_REALM=lumera
+      - NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=lumera-frontend
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./services/frontend/src:/app/src:delegated
+      - ./services/frontend/public:/app/public:delegated
+    depends_on:
+      - backend
+    networks:
+      - lumera-network
+
+  # Redis (for caching and sessions)
+  redis:
+    image: redis:7-alpine
+    container_name: lumera-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - lumera-network
+
+  # Adminer (Database Management UI)
+  adminer:
+    image: adminer:latest
+    container_name: lumera-adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    networks:
+      - lumera-network
+
+  # MailDev (Local Email Testing)
+  maildev:
+    image: maildev/maildev:2.1.0
+    container_name: lumera-maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080"  # Web UI
+      - "1025:1025"  # SMTP Server
+    networks:
+      - lumera-network
+
+volumes:
+  postgres_data:
+  keycloak_db_data:
+  redis_data:
+
+networks:
+  lumera-network:
+    driver: bridge
