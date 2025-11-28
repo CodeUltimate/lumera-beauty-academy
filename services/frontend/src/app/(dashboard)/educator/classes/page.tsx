@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Calendar, Clock, MoreVertical, Edit, Trash2, Radio, Search, Loader2, AlertCircle, Filter, X, ChevronDown } from 'lucide-react';
@@ -17,7 +17,7 @@ const SKILL_LEVELS: { value: SkillLevel; label: string }[] = [
   { value: 'ADVANCED', label: 'Advanced' },
 ];
 
-export default function EducatorClassesPage() {
+function EducatorClassesContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab') as TabType | null;
 
@@ -412,5 +412,19 @@ export default function EducatorClassesPage() {
         )}
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function EducatorClassesPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-[var(--champagne)]" />
+        </div>
+      </DashboardLayout>
+    }>
+      <EducatorClassesContent />
+    </Suspense>
   );
 }
