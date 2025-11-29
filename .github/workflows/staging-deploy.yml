@@ -67,12 +67,13 @@ jobs:
 
       - name: Run linting
         working-directory: ./services/frontend
-        run: npm run lint || true
+        run: npm run lint
 
       - name: Build frontend
         run: npm run frontend:build
         env:
-          NEXT_PUBLIC_API_URL: https://api.staging.lumera.academy
+          # Will be set to ALB DNS or custom domain via GitHub Actions variable
+          NEXT_PUBLIC_API_URL: ${{ vars.API_URL || 'http://localhost:8080/api' }}
           NEXT_TELEMETRY_DISABLED: 1
 
   # ==========================================================================
@@ -125,7 +126,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            NEXT_PUBLIC_API_URL=https://api.staging.lumera.academy
+            NEXT_PUBLIC_API_URL=${{ vars.API_URL || 'http://localhost:8080/api' }}
 
       - name: Build and push backend image
         id: build-backend
@@ -222,6 +223,15 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
+      - name: Get ALB DNS
+        id: alb
+        run: |
+          ALB_DNS=$(aws elbv2 describe-load-balancers \
+            --names lumera-${ENVIRONMENT}-alb \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text 2>/dev/null || echo "ALB not found")
+          echo "dns=$ALB_DNS" >> $GITHUB_OUTPUT
+
       - name: Deployment summary
         run: |
           echo "## Staging Deployment Complete! :rocket:" >> $GITHUB_STEP_SUMMARY
@@ -234,6 +244,7 @@ jobs:
           echo "- **Backend:** \`${{ steps.ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### URLs" >> $GITHUB_STEP_SUMMARY
-          echo "- Frontend: https://staging.lumera.academy" >> $GITHUB_STEP_SUMMARY
-          echo "- API: https://api.staging.lumera.academy" >> $GITHUB_STEP_SUMMARY
-          echo "- Swagger: https://api.staging.lumera.academy/swagger-ui.html" >> $GITHUB_STEP_SUMMARY
+          echo "- **ALB DNS:** \`${{ steps.alb.outputs.dns }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **API URL:** \`${{ vars.API_URL || 'Not configured' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Note:** Set \`API_URL\` and \`FRONTEND_URL\` in GitHub repository variables once ALB is deployed." >> $GITHUB_STEP_SUMMARY

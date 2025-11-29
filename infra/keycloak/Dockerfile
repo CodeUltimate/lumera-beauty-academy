@@ -20,10 +20,11 @@ FROM quay.io/keycloak/keycloak:24.0
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
-# Railway provides PORT env var
-ENV KC_HTTP_PORT=${PORT:-8080}
+# Copy startup script
+COPY start.sh /opt/keycloak/start.sh
+USER root
+RUN chmod +x /opt/keycloak/start.sh
+USER keycloak
 
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
-
-# Start in production mode with import
-CMD ["start", "--optimized", "--import-realm", "--hostname-strict=false", "--http-enabled=true", "--proxy=edge"]
+# Use startup script that reads PORT env var (defaults to 8080)
+CMD ["/opt/keycloak/start.sh"]
