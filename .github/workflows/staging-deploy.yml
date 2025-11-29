@@ -85,8 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend]
 
-    # Only run if AWS_ROLE_ARN is configured
-    if: ${{ vars.AWS_ROLE_ARN != '' || secrets.AWS_ROLE_ARN != '' }}
+    # Note: AWS_ROLE_ARN must be configured in GitHub Secrets for this to work
 
     outputs:
       frontend-image: ${{ steps.build-frontend.outputs.imageid }}
