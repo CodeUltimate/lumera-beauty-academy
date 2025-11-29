@@ -41,7 +41,10 @@
         "iam:DeleteOpenIDConnectProvider",
         "iam:GetOpenIDConnectProvider",
         "iam:TagOpenIDConnectProvider",
-        "iam:ListOpenIDConnectProviders"
+        "iam:ListOpenIDConnectProviders",
+        "iam:TagPolicy",
+        "iam:UntagPolicy",
+        "iam:ListPolicyTags"
       ],
       "Resource": "*"
     },
@@ -56,9 +59,7 @@
       "Effect": "Allow",
       "Action": [
         "logs:*",
-        "cloudwatch:PutMetricAlarm",
-        "cloudwatch:DeleteAlarms",
-        "cloudwatch:DescribeAlarms"
+        "cloudwatch:*"
       ],
       "Resource": "*"
     },

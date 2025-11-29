@@ -18,14 +18,13 @@ terraform {
     }
   }
 
-  # Uncomment after first apply to enable remote state
-  # backend "s3" {
-  #   bucket         = "lumera-terraform-state"
-  #   key            = "bootstrap/terraform.tfstate"
-  #   region         = "eu-west-1"
-  #   dynamodb_table = "lumera-terraform-locks"
-  #   encrypt        = true
-  # }
+  backend "s3" {
+    bucket         = "lumera-terraform-state"
+    key            = "bootstrap/terraform.tfstate"
+    region         = "eu-west-1"
+    dynamodb_table = "lumera-terraform-locks"
+    encrypt        = true
+  }
 }
 
 # -----------------------------------------------------------------------------

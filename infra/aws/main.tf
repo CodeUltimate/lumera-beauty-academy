@@ -11,14 +11,13 @@ terraform {
     }
   }
 
-  # Uncomment and configure for remote state
-  # backend "s3" {
-  #   bucket         = "lumera-terraform-state"
-  #   key            = "staging/terraform.tfstate"
-  #   region         = "eu-west-1"
-  #   dynamodb_table = "lumera-terraform-locks"
-  #   encrypt        = true
-  # }
+  backend "s3" {
+    bucket         = "lumera-terraform-state"
+    key            = "staging/terraform.tfstate"
+    region         = "eu-west-1"
+    dynamodb_table = "lumera-terraform-locks"
+    encrypt        = true
+  }
 }
 
 provider "aws" {
@@ -87,62 +86,13 @@ module "vpc" {
   }
 }
 
-# ECR Repositories
-resource "aws_ecr_repository" "frontend" {
-  name                 = "lumera-frontend"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
+# ECR Repositories - Created in bootstrap, reference them here
+data "aws_ecr_repository" "frontend" {
+  name = "lumera-frontend"
 }
 
-resource "aws_ecr_repository" "backend" {
-  name                 = "lumera-backend"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
-
-# ECR Lifecycle policy to clean up old images
-resource "aws_ecr_lifecycle_policy" "frontend" {
-  repository = aws_ecr_repository.frontend.name
-
-  policy = jsonencode({
-    rules = [{
-      rulePriority = 1
-      description  = "Keep last 10 images"
-      selection = {
-        tagStatus   = "any"
-        countType   = "imageCountMoreThan"
-        countNumber = 10
-      }
-      action = {
-        type = "expire"
-      }
-    }]
-  })
-}
-
-resource "aws_ecr_lifecycle_policy" "backend" {
-  repository = aws_ecr_repository.backend.name
-
-  policy = jsonencode({
-    rules = [{
-      rulePriority = 1
-      description  = "Keep last 10 images"
-      selection = {
-        tagStatus   = "any"
-        countType   = "imageCountMoreThan"
-        countNumber = 10
-      }
-      action = {
-        type = "expire"
-      }
-    }]
-  })
+data "aws_ecr_repository" "backend" {
+  name = "lumera-backend"
 }
 
 # Security Groups
@@ -222,7 +172,7 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_db_instance" "postgres" {
   identifier        = "lumera-${var.environment}-db"
   engine            = "postgres"
-  engine_version    = "16.1"
+  engine_version    = "16.11"
   instance_class    = "db.t3.micro" # Staging - upgrade for production
   allocated_storage = 20
 
@@ -236,7 +186,7 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot = true # Set to false for production
   multi_az            = false # Set to true for production
 
-  backup_retention_period = 7
+  backup_retention_period = 1  # Free tier limit
   backup_window          = "03:00-04:00"
   maintenance_window     = "Mon:04:00-Mon:05:00"
 }
@@ -394,12 +344,26 @@ resource "aws_lb_listener" "http" {
   port              = 80
   protocol          = "HTTP"
 
+  # Default action: forward to frontend
   default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+# Route /api/* requests to backend
+resource "aws_lb_listener_rule" "backend_api" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/*"]
     }
   }
 }
@@ -430,7 +394,7 @@ resource "aws_ecs_task_definition" "frontend" {
 
   container_definitions = jsonencode([{
     name  = "frontend"
-    image = "${aws_ecr_repository.frontend.repository_url}:latest"
+    image = "${data.aws_ecr_repository.frontend.repository_url}:latest"
 
     portMappings = [{
       containerPort = 3000
@@ -472,7 +436,7 @@ resource "aws_ecs_task_definition" "backend" {
 
   container_definitions = jsonencode([{
     name  = "backend"
-    image = "${aws_ecr_repository.backend.repository_url}:latest"
+    image = "${data.aws_ecr_repository.backend.repository_url}:latest"
 
     portMappings = [{
       containerPort = 8080
@@ -596,17 +560,17 @@ resource "aws_ecs_service" "backend" {
     container_port   = 8080
   }
 
-  depends_on = [aws_lb_listener.http, aws_db_instance.postgres]
+  depends_on = [aws_lb_listener.http, aws_lb_listener_rule.backend_api, aws_db_instance.postgres]
 }
 
 # Outputs
 output "ecr_frontend_url" {
-  value       = aws_ecr_repository.frontend.repository_url
+  value       = data.aws_ecr_repository.frontend.repository_url
   description = "ECR repository URL for frontend"
 }
 
 output "ecr_backend_url" {
-  value       = aws_ecr_repository.backend.repository_url
+  value       = data.aws_ecr_repository.backend.repository_url
   description = "ECR repository URL for backend"
 }
 
