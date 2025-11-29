@@ -53,12 +53,6 @@ app:
     allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
   auth:
     enabled: ${AUTH_ENABLED:false}
-  upload:
-    max-file-size: 10MB
-    allowed-types: image/jpeg,image/png,image/webp,video/mp4
-  platform:
-    fee-percentage: 20
-  auth:
     cookie:
       access-name: lumera_at
       refresh-name: lumera_rt
@@ -68,6 +62,11 @@ app:
       same-site: Lax
       access-max-age-seconds: 600
       refresh-max-age-seconds: 3600
+  upload:
+    max-file-size: 10MB
+    allowed-types: image/jpeg,image/png,image/webp,video/mp4
+  platform:
+    fee-percentage: 20
 
 # Actuator
 management:
