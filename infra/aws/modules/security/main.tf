@@ -111,7 +111,7 @@ resource "aws_iam_role" "github_actions" {
   name = "${var.project_name}-github-actions-${var.environment}"
   description = "Role for GitHub Actions CI/CD - ${var.project_name} ${var.environment}"
 
-  # Trust policy - only allow GitHub Actions from specific repo/branches
+  # Trust policy - only allow GitHub Actions from specific repo/branches/environments
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -126,11 +126,14 @@ resource "aws_iam_role" "github_actions" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            # Only allow specific repo and branches
-            "token.actions.githubusercontent.com:sub" = [
-              for branch in var.allowed_branches :
-              "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${branch}"
-            ]
+            # Allow specific repo with branches OR environments
+            "token.actions.githubusercontent.com:sub" = concat(
+              [for branch in var.allowed_branches :
+                "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${branch}"
+              ],
+              # Also allow environment-based claims (for deployment jobs)
+              ["repo:${var.github_org}/${var.github_repo}:environment:${var.environment}"]
+            )
           }
         }
       }
