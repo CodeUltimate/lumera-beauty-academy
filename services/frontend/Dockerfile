@@ -2,14 +2,18 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files from frontend directory
+COPY package.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies using npm install (no lock file in this directory)
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
+
+# Accept build-time API URL
+ARG NEXT_PUBLIC_API_URL=http://localhost:8080/api
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
