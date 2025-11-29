@@ -2,11 +2,13 @@ package com.lumera.academy.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "keycloak")
+@ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true", matchIfMissing = false)
 @Getter
 @Setter
 public class KeycloakConfig {

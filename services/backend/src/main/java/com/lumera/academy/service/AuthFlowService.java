@@ -10,12 +10,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true", matchIfMissing = false)
 public class AuthFlowService {
 
     private final KeycloakConfig keycloakConfig;

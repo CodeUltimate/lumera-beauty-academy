@@ -9,12 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/user/2fa")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true", matchIfMissing = false)
 public class TwoFactorController {
 
     private final TwoFactorService twoFactorService;

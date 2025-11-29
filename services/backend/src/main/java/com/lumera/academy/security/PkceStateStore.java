@@ -8,7 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 @Component
+@ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true", matchIfMissing = false)
 public class PkceStateStore {
 
     private static final long STATE_TTL_SECONDS = 600; // 10 minutes

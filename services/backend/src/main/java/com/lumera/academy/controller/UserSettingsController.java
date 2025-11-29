@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,16 +22,27 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/user/settings")
-@RequiredArgsConstructor
 @Tag(name = "User Settings", description = "User profile and settings management")
 public class UserSettingsController {
 
     private final UserRepository userRepository;
     private final SecurityUtils securityUtils;
-    private final PasswordService passwordService;
+    private final Optional<PasswordService> passwordService;
+
+    @Autowired
+    public UserSettingsController(
+            UserRepository userRepository,
+            SecurityUtils securityUtils,
+            @Autowired(required = false) PasswordService passwordService
+    ) {
+        this.userRepository = userRepository;
+        this.securityUtils = securityUtils;
+        this.passwordService = Optional.ofNullable(passwordService);
+    }
 
     @GetMapping("/profile")
     @Operation(summary = "Get current user profile")
@@ -155,7 +167,9 @@ public class UserSettingsController {
             @Valid @RequestBody ChangePasswordRequest request
     ) {
         String email = securityUtils.getEmailFromJwt(jwt);
-        passwordService.changePassword(email, request);
+        passwordService.orElseThrow(() -> new com.lumera.academy.exception.BadRequestException(
+                "Password change is not available when authentication is disabled"
+        )).changePassword(email, request);
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 }

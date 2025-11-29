@@ -1,11 +1,10 @@
 package com.lumera.academy.config;
 
-import com.lumera.academy.security.KeycloakJwtAuthenticationConverter;
-import com.lumera.academy.security.CookieBearerTokenResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +14,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,54 +27,46 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final KeycloakJwtAuthenticationConverter keycloakJwtAuthenticationConverter;
-    private final CookieBearerTokenResolver cookieBearerTokenResolver;
-
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
+
+    @Value("${app.auth.enabled:true}")
+    private boolean authEnabled;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/v1/auth/**").permitAll()
-                        .requestMatchers("/v1/verification/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                        // Public read access
-                        .requestMatchers(HttpMethod.GET, "/v1/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/classes/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/educators/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/certificates/verify/**").permitAll()
+        if (authEnabled) {
+            // Full authentication enabled - for production with proper auth
+            http.authorizeHttpRequests(auth -> auth
+                    // Public endpoints
+                    .requestMatchers("/v1/auth/**").permitAll()
+                    .requestMatchers("/v1/verification/**").permitAll()
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                    .requestMatchers("/actuator/health", "/actuator/info").permitAll()
 
-                        // Educator endpoints
-                        .requestMatchers("/v1/educator/**").hasRole("EDUCATOR")
+                    // Public read access
+                    .requestMatchers(HttpMethod.GET, "/v1/categories/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/v1/classes/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/v1/educators/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/v1/certificates/verify/**").permitAll()
 
-                        // Student endpoints
-                        .requestMatchers("/v1/student/**").hasRole("STUDENT")
-
-                        // Admin endpoints
-                        .requestMatchers("/v1/admin/**").hasRole("ADMIN")
-
-                        // All other endpoints require authentication
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(keycloakJwtAuthenticationConverter))
-                        .bearerTokenResolver(bearerTokenResolver())
-                );
+                    // All other endpoints require authentication
+                    .anyRequest().authenticated()
+            );
+            // Note: OAuth2 resource server will be configured when Supabase Auth is integrated
+        } else {
+            // Auth disabled - for initial deployment/testing
+            http.authorizeHttpRequests(auth -> auth
+                    .anyRequest().permitAll()
+            );
+        }
 
         return http.build();
-    }
-
-    @Bean
-    public BearerTokenResolver bearerTokenResolver() {
-        return cookieBearerTokenResolver;
     }
 
     @Bean

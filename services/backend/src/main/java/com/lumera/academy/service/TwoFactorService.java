@@ -24,9 +24,12 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true", matchIfMissing = false)
 public class TwoFactorService {
 
     private static final String ISSUER = "Luméra Beauty Academy";

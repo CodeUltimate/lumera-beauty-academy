@@ -29,11 +29,14 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Optional;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 @RestController
 @RequestMapping("/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Authentication endpoints via Keycloak")
 @lombok.extern.slf4j.Slf4j
+@ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true", matchIfMissing = false)
 public class AuthController {
 
     private final KeycloakAuthService keycloakAuthService;
