@@ -57,6 +57,19 @@ variable "jwt_secret" {
   sensitive   = true
 }
 
+variable "keycloak_admin_password" {
+  description = "Keycloak admin password"
+  type        = string
+  sensitive   = true
+  default     = "admin"  # Change in production
+}
+
+variable "keycloak_db_password" {
+  description = "Keycloak database password"
+  type        = string
+  sensitive   = true
+}
+
 # Data sources
 data "aws_availability_zones" "available" {
   state = "available"
@@ -93,6 +106,10 @@ data "aws_ecr_repository" "frontend" {
 
 data "aws_ecr_repository" "backend" {
   name = "lumera-backend"
+}
+
+data "aws_ecr_repository" "keycloak" {
+  name = "lumera-keycloak"
 }
 
 # Security Groups
@@ -142,6 +159,14 @@ resource "aws_security_group" "ecs_tasks" {
     security_groups = [aws_security_group.alb.id]
   }
 
+  # Keycloak port
+  ingress {
+    from_port       = 8180
+    to_port         = 8180
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -187,6 +212,29 @@ resource "aws_db_instance" "postgres" {
   multi_az            = false # Set to true for production
 
   backup_retention_period = 1  # Free tier limit
+  backup_window          = "03:00-04:00"
+  maintenance_window     = "Mon:04:00-Mon:05:00"
+}
+
+# Keycloak PostgreSQL Database
+resource "aws_db_instance" "keycloak" {
+  identifier        = "lumera-${var.environment}-keycloak-db"
+  engine            = "postgres"
+  engine_version    = "16.11"
+  instance_class    = "db.t3.micro"
+  allocated_storage = 20
+
+  db_name  = "keycloak"
+  username = "keycloak_admin"
+  password = var.keycloak_db_password
+
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+
+  skip_final_snapshot = true
+  multi_az            = false
+
+  backup_retention_period = 1
   backup_window          = "03:00-04:00"
   maintenance_window     = "Mon:04:00-Mon:05:00"
 }
@@ -292,6 +340,11 @@ resource "aws_cloudwatch_log_group" "backend" {
   retention_in_days = 14
 }
 
+resource "aws_cloudwatch_log_group" "keycloak" {
+  name              = "/ecs/lumera-${var.environment}-keycloak"
+  retention_in_days = 14
+}
+
 # Application Load Balancer
 resource "aws_lb" "main" {
   name               = "lumera-${var.environment}-alb"
@@ -339,6 +392,24 @@ resource "aws_lb_target_group" "backend" {
   }
 }
 
+resource "aws_lb_target_group" "keycloak" {
+  name        = "lumera-${var.environment}-keycloak-tg"
+  port        = 8180
+  protocol    = "HTTP"
+  vpc_id      = module.vpc.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    path                = "/health/ready"
+    matcher             = "200"
+  }
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
@@ -364,6 +435,23 @@ resource "aws_lb_listener_rule" "backend_api" {
   condition {
     path_pattern {
       values = ["/api/*"]
+    }
+  }
+}
+
+# Route /auth/* requests to Keycloak (for realms, admin, etc.)
+resource "aws_lb_listener_rule" "keycloak_auth" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 90
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.keycloak.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/auth/*", "/realms/*", "/admin/*", "/resources/*", "/health/*"]
     }
   }
 }
@@ -403,7 +491,7 @@ resource "aws_ecs_task_definition" "frontend" {
     }]
 
     environment = [
-      { name = "NEXT_PUBLIC_API_URL", value = "https://api.staging.lumera.academy" }
+      { name = "NEXT_PUBLIC_API_URL", value = "http://${aws_lb.main.dns_name}/api" }
     ]
 
     logConfiguration = {
@@ -418,9 +506,9 @@ resource "aws_ecs_task_definition" "frontend" {
     healthCheck = {
       command     = ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1"]
       interval    = 30
-      timeout     = 5
-      retries     = 3
-      startPeriod = 60
+      timeout     = 10
+      retries     = 5
+      startPeriod = 120
     }
   }])
 }
@@ -452,7 +540,17 @@ resource "aws_ecs_task_definition" "backend" {
       { name = "DB_USERNAME", value = "lumera_admin" },
       { name = "REDIS_HOST", value = aws_elasticache_cluster.redis.cache_nodes[0].address },
       { name = "REDIS_PORT", value = "6379" },
-      { name = "CORS_ORIGINS", value = "https://staging.lumera.academy" }
+      { name = "CORS_ORIGINS", value = "http://${aws_lb.main.dns_name}" },
+      { name = "APP_FRONTEND_URL", value = "http://${aws_lb.main.dns_name}" },
+      { name = "APP_AUTH_ENABLED", value = "true" },
+      { name = "KEYCLOAK_URL", value = "http://${aws_lb.main.dns_name}" },
+      { name = "KEYCLOAK_EXTERNAL_URL", value = "http://${aws_lb.main.dns_name}" },
+      { name = "KEYCLOAK_REALM", value = "lumera" },
+      { name = "KEYCLOAK_CLIENT_ID", value = "lumera-backend" },
+      { name = "KEYCLOAK_CLIENT_SECRET", value = "backend-secret" },
+      { name = "KEYCLOAK_FRONTEND_CLIENT_ID", value = "lumera-frontend" },
+      { name = "KEYCLOAK_REDIRECT_URI", value = "http://${aws_lb.main.dns_name}/api/v1/auth/callback" },
+      { name = "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI", value = "http://${aws_lb.main.dns_name}/realms/lumera" }
     ]
 
     secrets = [
@@ -471,6 +569,65 @@ resource "aws_ecs_task_definition" "backend" {
 
     healthCheck = {
       command     = ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/api/actuator/health || exit 1"]
+      interval    = 30
+      timeout     = 5
+      retries     = 3
+      startPeriod = 120
+    }
+  }])
+}
+
+resource "aws_ecs_task_definition" "keycloak" {
+  family                   = "lumera-keycloak-task"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 512
+  memory                   = 1024
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
+  container_definitions = jsonencode([{
+    name  = "keycloak"
+    image = "${data.aws_ecr_repository.keycloak.repository_url}:latest"
+
+    portMappings = [{
+      containerPort = 8180
+      hostPort      = 8180
+      protocol      = "tcp"
+    }]
+
+    environment = [
+      { name = "PORT", value = "8180" },
+      { name = "KC_DB", value = "postgres" },
+      { name = "KC_DB_URL", value = "jdbc:postgresql://${aws_db_instance.keycloak.address}:5432/keycloak" },
+      { name = "KC_DB_USERNAME", value = "keycloak_admin" },
+      { name = "KC_DB_SCHEMA", value = "public" },
+      { name = "KEYCLOAK_ADMIN", value = "admin" },
+      { name = "KC_HOSTNAME_STRICT", value = "false" },
+      { name = "KC_HTTP_ENABLED", value = "true" },
+      { name = "KC_PROXY", value = "edge" },
+      { name = "KC_HEALTH_ENABLED", value = "true" },
+      { name = "KC_METRICS_ENABLED", value = "true" },
+      { name = "FRONTEND_URL", value = "http://${aws_lb.main.dns_name}" }
+    ]
+
+    secrets = [
+      { name = "KC_DB_PASSWORD", valueFrom = "${aws_secretsmanager_secret.keycloak_db_password.arn}" },
+      { name = "KEYCLOAK_ADMIN_PASSWORD", valueFrom = "${aws_secretsmanager_secret.keycloak_admin_password.arn}" }
+    ]
+
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.keycloak.name
+        "awslogs-region"        = var.aws_region
+        "awslogs-stream-prefix" = "keycloak"
+      }
+    }
+
+    # ALB handles health checks; container health check disabled as Keycloak image lacks curl/wget
+    healthCheck = {
+      command     = ["CMD-SHELL", "exit 0"]
       interval    = 30
       timeout     = 5
       retries     = 3
@@ -498,6 +655,24 @@ resource "aws_secretsmanager_secret_version" "jwt_secret" {
   secret_string = var.jwt_secret
 }
 
+resource "aws_secretsmanager_secret" "keycloak_admin_password" {
+  name = "lumera-${var.environment}-keycloak-admin-password"
+}
+
+resource "aws_secretsmanager_secret_version" "keycloak_admin_password" {
+  secret_id     = aws_secretsmanager_secret.keycloak_admin_password.id
+  secret_string = var.keycloak_admin_password
+}
+
+resource "aws_secretsmanager_secret" "keycloak_db_password" {
+  name = "lumera-${var.environment}-keycloak-db-password"
+}
+
+resource "aws_secretsmanager_secret_version" "keycloak_db_password" {
+  secret_id     = aws_secretsmanager_secret.keycloak_db_password.id
+  secret_string = var.keycloak_db_password
+}
+
 # IAM policy for secrets access
 resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
   name = "lumera-${var.environment}-secrets-access"
@@ -512,7 +687,9 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
       ]
       Resource = [
         aws_secretsmanager_secret.db_password.arn,
-        aws_secretsmanager_secret.jwt_secret.arn
+        aws_secretsmanager_secret.jwt_secret.arn,
+        aws_secretsmanager_secret.keycloak_admin_password.arn,
+        aws_secretsmanager_secret.keycloak_db_password.arn
       ]
     }]
   })
@@ -563,6 +740,28 @@ resource "aws_ecs_service" "backend" {
   depends_on = [aws_lb_listener.http, aws_lb_listener_rule.backend_api, aws_db_instance.postgres]
 }
 
+resource "aws_ecs_service" "keycloak" {
+  name            = "lumera-keycloak-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.keycloak.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = module.vpc.private_subnets
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.keycloak.arn
+    container_name   = "keycloak"
+    container_port   = 8180
+  }
+
+  depends_on = [aws_lb_listener.http, aws_lb_listener_rule.keycloak_auth, aws_db_instance.postgres]
+}
+
 # Outputs
 output "ecr_frontend_url" {
   value       = data.aws_ecr_repository.frontend.repository_url
@@ -582,6 +781,11 @@ output "alb_dns_name" {
 output "rds_endpoint" {
   value       = aws_db_instance.postgres.endpoint
   description = "RDS endpoint"
+}
+
+output "keycloak_rds_endpoint" {
+  value       = aws_db_instance.keycloak.endpoint
+  description = "Keycloak RDS endpoint"
 }
 
 output "redis_endpoint" {

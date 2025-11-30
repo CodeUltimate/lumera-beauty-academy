@@ -160,24 +160,27 @@
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
       "authorizationServicesEnabled": false,
-      "rootUrl": "http://localhost:3000",
-      "baseUrl": "http://localhost:3000",
+      "rootUrl": "${FRONTEND_URL:http://localhost:3000}",
+      "baseUrl": "${FRONTEND_URL:http://localhost:3000}",
       "redirectUris": [
         "http://localhost:3000/*",
-        "http://localhost:8080/*"
+        "http://localhost:8080/*",
+        "http://lumera-staging-alb-885049427.eu-west-1.elb.amazonaws.com/*"
       ],
       "webOrigins": [
         "http://localhost:3000",
-        "http://localhost:8080"
+        "http://localhost:8080",
+        "http://lumera-staging-alb-885049427.eu-west-1.elb.amazonaws.com"
       ],
       "attributes": {
         "access.token.lifespan": "86400",
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:3000/*",
+        "post.logout.redirect.uris": "http://localhost:3000/*##http://lumera-staging-alb-885049427.eu-west-1.elb.amazonaws.com/*",
         "login_theme": "lumera"
       },
       "fullScopeAllowed": true,
       "defaultClientScopes": [
+        "openid",
         "web-origins",
         "acr",
         "profile",
