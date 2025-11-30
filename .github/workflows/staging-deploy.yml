@@ -17,11 +17,16 @@ env:
   ENVIRONMENT: staging
   FRONTEND_REPOSITORY: lumera-frontend
   BACKEND_REPOSITORY: lumera-backend
+  KEYCLOAK_REPOSITORY: lumera-keycloak
   ECS_CLUSTER: lumera-staging
   FRONTEND_SERVICE: lumera-frontend-service
   BACKEND_SERVICE: lumera-backend-service
+  KEYCLOAK_SERVICE: lumera-keycloak-service
   FRONTEND_TASK_DEFINITION: lumera-frontend-task
   BACKEND_TASK_DEFINITION: lumera-backend-task
+  KEYCLOAK_TASK_DEFINITION: lumera-keycloak-task
+  # Timeout in minutes for ECS service stability check
+  ECS_DEPLOY_TIMEOUT: 5
 
 jobs:
   # ==========================================================================
@@ -67,8 +72,7 @@ jobs:
 
       - name: Run linting
         working-directory: ./services/frontend
-        run: npm run lint || echo "::warning::Linting has errors, but continuing with build"
-        continue-on-error: true
+        run: npm run lint
 
       - name: Build frontend
         run: npm run frontend:build
@@ -91,6 +95,7 @@ jobs:
     outputs:
       frontend-image: ${{ steps.build-frontend.outputs.imageid }}
       backend-image: ${{ steps.build-backend.outputs.imageid }}
+      keycloak-image: ${{ steps.build-keycloak.outputs.imageid }}
       ecr-registry: ${{ steps.login-ecr.outputs.registry }}
 
     steps:
@@ -141,6 +146,20 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build and push Keycloak image
+        id: build-keycloak
+        uses: docker/build-push-action@v5
+        with:
+          context: ./infra/keycloak
+          file: ./infra/keycloak/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.KEYCLOAK_REPOSITORY }}:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.KEYCLOAK_REPOSITORY }}:staging
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.KEYCLOAK_REPOSITORY }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build summary
         run: |
           echo "## Docker Images Built :whale:" >> $GITHUB_STEP_SUMMARY
@@ -149,27 +168,25 @@ jobs:
           echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Frontend | \`${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Backend | \`${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Keycloak | \`${{ steps.login-ecr.outputs.registry }}/${{ env.KEYCLOAK_REPOSITORY }}:${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
 
   # ==========================================================================
-  # Deploy to ECS
+  # Deploy to ECS - Parallel deployment for faster rollouts
   # ==========================================================================
 
-  deploy-staging:
-    name: Deploy to Staging
+  deploy-frontend:
+    name: Deploy Frontend
     runs-on: ubuntu-latest
     needs: build-and-push
     environment: staging
+    timeout-minutes: 10
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # OIDC Authentication
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: github-actions-deploy-${{ github.run_id }}
+          role-session-name: github-actions-frontend-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Get ECR registry
@@ -178,49 +195,134 @@ jobs:
           REGISTRY=$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
           echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
 
-      - name: Download current frontend task definition
+      - name: Download current task definition
         run: |
           aws ecs describe-task-definition \
             --task-definition ${{ env.FRONTEND_TASK_DEFINITION }} \
-            --query taskDefinition > frontend-task-def.json
+            --query taskDefinition > task-def.json
 
-      - name: Update frontend task definition with new image
-        id: frontend-task-def
+      - name: Update task definition with new image
+        id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: frontend-task-def.json
+          task-definition: task-def.json
           container-name: frontend
           image: ${{ steps.ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}
 
-      - name: Deploy frontend to ECS
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.frontend-task-def.outputs.task-definition }}
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ env.FRONTEND_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+          wait-for-minutes: ${{ env.ECS_DEPLOY_TIMEOUT }}
 
-      - name: Download current backend task definition
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: staging
+    timeout-minutes: 10
+
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-backend-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get ECR registry
+        id: ecr
+        run: |
+          REGISTRY=$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+
+      - name: Download current task definition
         run: |
           aws ecs describe-task-definition \
             --task-definition ${{ env.BACKEND_TASK_DEFINITION }} \
-            --query taskDefinition > backend-task-def.json
+            --query taskDefinition > task-def.json
 
-      - name: Update backend task definition with new image
-        id: backend-task-def
+      - name: Update task definition with new image
+        id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: backend-task-def.json
+          task-definition: task-def.json
           container-name: backend
           image: ${{ steps.ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}
 
-      - name: Deploy backend to ECS
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.backend-task-def.outputs.task-definition }}
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ env.BACKEND_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+          wait-for-minutes: ${{ env.ECS_DEPLOY_TIMEOUT }}
+
+  deploy-keycloak:
+    name: Deploy Keycloak
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: staging
+    timeout-minutes: 10
+
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-keycloak-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get ECR registry
+        id: ecr
+        run: |
+          REGISTRY=$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+
+      - name: Download current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.KEYCLOAK_TASK_DEFINITION }} \
+            --query taskDefinition > task-def.json
+
+      - name: Update task definition with new image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-def.json
+          container-name: keycloak
+          image: ${{ steps.ecr.outputs.registry }}/${{ env.KEYCLOAK_REPOSITORY }}:${{ github.sha }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.KEYCLOAK_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          wait-for-minutes: ${{ env.ECS_DEPLOY_TIMEOUT }}
+
+  # ==========================================================================
+  # Post-deployment Summary
+  # ==========================================================================
+
+  deployment-summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend, deploy-backend, deploy-keycloak]
+    if: always()
+
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-summary-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Get ALB DNS
         id: alb
@@ -231,6 +333,12 @@ jobs:
             --output text 2>/dev/null || echo "ALB not found")
           echo "dns=$ALB_DNS" >> $GITHUB_OUTPUT
 
+      - name: Get ECR registry
+        id: ecr
+        run: |
+          REGISTRY=$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+
       - name: Deployment summary
         run: |
           echo "## Staging Deployment Complete! :rocket:" >> $GITHUB_STEP_SUMMARY
@@ -238,12 +346,18 @@ jobs:
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Environment:** ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | ${{ needs.deploy-frontend.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend | ${{ needs.deploy-backend.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Keycloak | ${{ needs.deploy-keycloak.result == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Deployed Images" >> $GITHUB_STEP_SUMMARY
           echo "- **Frontend:** \`${{ steps.ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Backend:** \`${{ steps.ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Keycloak:** \`${{ steps.ecr.outputs.registry }}/${{ env.KEYCLOAK_REPOSITORY }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### URLs" >> $GITHUB_STEP_SUMMARY
           echo "- **ALB DNS:** \`${{ steps.alb.outputs.dns }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **API URL:** \`${{ vars.API_URL || 'Not configured' }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "> **Note:** Set \`API_URL\` and \`FRONTEND_URL\` in GitHub repository variables once ALB is deployed." >> $GITHUB_STEP_SUMMARY
