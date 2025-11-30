@@ -26,7 +26,7 @@ env:
   BACKEND_TASK_DEFINITION: lumera-backend-task
   KEYCLOAK_TASK_DEFINITION: lumera-keycloak-task
   # Timeout in minutes for ECS service stability check
-  ECS_DEPLOY_TIMEOUT: 5
+  ECS_DEPLOY_TIMEOUT: 8
 
 jobs:
   # ==========================================================================
