@@ -26,8 +26,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install wget for health checks
-RUN apk add --no-cache wget
+# Install wget for health checks (cache bust: v2)
+RUN apk add --no-cache wget && wget --version
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
