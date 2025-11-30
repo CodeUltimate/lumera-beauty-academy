@@ -123,8 +123,7 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}
             ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:staging
             ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
           build-args: |
             NEXT_PUBLIC_API_URL=${{ vars.API_URL || 'http://localhost:8080/api' }}
 
