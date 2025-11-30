@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { Mail, MapPin, Clock, Send, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 export default function ContactPage() {
+  const t = useTranslations('contact');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,13 +35,13 @@ export default function ContactPage() {
       <section className="pt-32 pb-16 px-6 bg-gradient-to-b from-white to-[var(--cream)]">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xs font-medium tracking-widest uppercase text-[var(--champagne)] mb-4">
-            Contact Us
+            {t('sectionLabel')}
           </p>
           <h1 className="text-4xl md:text-5xl font-extralight text-[var(--charcoal)] mb-6">
-            Get in Touch
+            {t('pageTitle')}
           </h1>
           <p className="text-xl font-light text-[var(--text-secondary)] max-w-2xl mx-auto">
-            Have a question or need assistance? We are here to help.
+            {t('pageDescription')}
           </p>
         </div>
       </section>
@@ -52,10 +54,10 @@ export default function ContactPage() {
             <div className="space-y-8">
               <div>
                 <h2 className="text-2xl font-light text-[var(--charcoal)] mb-6">
-                  Contact Information
+                  {t('contactInfo')}
                 </h2>
                 <p className="text-[var(--text-secondary)] font-light">
-                  Reach out to us through any of the following channels.
+                  {t('reachOut')}
                 </p>
               </div>
 
@@ -65,7 +67,7 @@ export default function ContactPage() {
                     <Mail className="w-5 h-5 text-[var(--champagne)]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-[var(--charcoal)] mb-1">Email</h3>
+                    <h3 className="text-sm font-medium text-[var(--charcoal)] mb-1">{t('email')}</h3>
                     <p className="text-[var(--text-secondary)] font-light">support@lumera.academy</p>
                     <p className="text-[var(--text-secondary)] font-light">educators@lumera.academy</p>
                   </div>
@@ -76,12 +78,12 @@ export default function ContactPage() {
                     <MapPin className="w-5 h-5 text-[var(--champagne)]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-[var(--charcoal)] mb-1">Headquarters</h3>
+                    <h3 className="text-sm font-medium text-[var(--charcoal)] mb-1">{t('headquarters')}</h3>
                     <p className="text-[var(--text-secondary)] font-light">
-                      London, United Kingdom
+                      {t('location')}
                     </p>
                     <p className="text-[var(--text-muted)] text-sm font-light">
-                      Global online platform
+                      {t('globalPlatform')}
                     </p>
                   </div>
                 </div>
@@ -91,12 +93,12 @@ export default function ContactPage() {
                     <Clock className="w-5 h-5 text-[var(--champagne)]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-[var(--charcoal)] mb-1">Support Hours</h3>
+                    <h3 className="text-sm font-medium text-[var(--charcoal)] mb-1">{t('supportHours')}</h3>
                     <p className="text-[var(--text-secondary)] font-light">
-                      Monday - Friday: 9am - 6pm GMT
+                      {t('supportSchedule')}
                     </p>
                     <p className="text-[var(--text-muted)] text-sm font-light">
-                      Response within 24 hours
+                      {t('responseTime')}
                     </p>
                   </div>
                 </div>
@@ -104,21 +106,21 @@ export default function ContactPage() {
 
               {/* Quick Links */}
               <div className="pt-6 border-t border-[var(--border-light)]">
-                <h3 className="text-sm font-medium text-[var(--charcoal)] mb-4">Quick Links</h3>
+                <h3 className="text-sm font-medium text-[var(--charcoal)] mb-4">{t('quickLinks')}</h3>
                 <ul className="space-y-2">
                   <li>
                     <a href="/help" className="text-[var(--champagne)] font-light hover:underline">
-                      Help Center & FAQs
+                      {t('helpCenter')}
                     </a>
                   </li>
                   <li>
                     <a href="/become-educator" className="text-[var(--champagne)] font-light hover:underline">
-                      Become an Educator
+                      {t('becomeEducator')}
                     </a>
                   </li>
                   <li>
                     <a href="/about" className="text-[var(--champagne)] font-light hover:underline">
-                      About Luméra
+                      {t('aboutLumera')}
                     </a>
                   </li>
                 </ul>
@@ -133,10 +135,10 @@ export default function ContactPage() {
                     <Check className="w-8 h-8 text-green-600" />
                   </div>
                   <h3 className="text-2xl font-light text-[var(--charcoal)] mb-4">
-                    Message Sent!
+                    {t('messageSent')}
                   </h3>
                   <p className="text-[var(--text-secondary)] font-light mb-6">
-                    Thank you for reaching out. Our team will get back to you within 24 hours.
+                    {t('thankYou')}
                   </p>
                   <button
                     onClick={() => {
@@ -145,22 +147,22 @@ export default function ContactPage() {
                     }}
                     className="btn-secondary"
                   >
-                    Send Another Message
+                    {t('sendAnother')}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="card-premium p-8 space-y-6">
                   <h2 className="text-2xl font-light text-[var(--charcoal)] mb-2">
-                    Send us a Message
+                    {t('sendMessage')}
                   </h2>
                   <p className="text-[var(--text-secondary)] font-light mb-6">
-                    Fill out the form below and we will get back to you as soon as possible.
+                    {t('formDescription')}
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                        Your Name *
+                        {t('yourName')} *
                       </label>
                       <input
                         type="text"
@@ -172,7 +174,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                        Email Address *
+                        {t('emailAddress')} *
                       </label>
                       <input
                         type="email"
@@ -186,7 +188,7 @@ export default function ContactPage() {
 
                   <div>
                     <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                      Subject *
+                      {t('subject')} *
                     </label>
                     <select
                       value={formData.subject}
@@ -194,25 +196,25 @@ export default function ContactPage() {
                       className="input-premium"
                       required
                     >
-                      <option value="">Select a topic</option>
-                      <option value="general">General Inquiry</option>
-                      <option value="support">Technical Support</option>
-                      <option value="billing">Billing & Payments</option>
-                      <option value="educator">Educator Application</option>
-                      <option value="partnership">Partnership Opportunities</option>
-                      <option value="other">Other</option>
+                      <option value="">{t('selectTopic')}</option>
+                      <option value="general">{t('topics.general')}</option>
+                      <option value="support">{t('topics.support')}</option>
+                      <option value="billing">{t('topics.billing')}</option>
+                      <option value="educator">{t('topics.educator')}</option>
+                      <option value="partnership">{t('topics.partnership')}</option>
+                      <option value="other">{t('topics.other')}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                      Message *
+                      {t('message')} *
                     </label>
                     <textarea
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       className="input-premium min-h-[180px] resize-none"
-                      placeholder="How can we help you?"
+                      placeholder={t('messagePlaceholder')}
                       required
                     />
                   </div>
@@ -223,11 +225,11 @@ export default function ContactPage() {
                     className="btn-primary flex items-center justify-center space-x-2 disabled:opacity-50"
                   >
                     {isSubmitting ? (
-                      <span>Sending...</span>
+                      <span>{t('sending')}</span>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        <span>Send Message</span>
+                        <span>{t('sendBtn')}</span>
                       </>
                     )}
                   </button>

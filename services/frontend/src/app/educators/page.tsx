@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import EducatorCard from '@/components/ui/EducatorCard';
@@ -9,6 +10,8 @@ import { mockEducators } from '@/data/mockData';
 import { getVisibleCategories } from '@/data/categories';
 
 export default function EducatorsPage() {
+  const t = useTranslations('educatorsPage');
+  const tCommon = useTranslations('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
   const categories = getVisibleCategories();
@@ -34,10 +37,10 @@ export default function EducatorsPage() {
           {/* Page Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-extralight text-[var(--charcoal)] mb-4">
-              Our Educators
+              {t('pageTitle')}
             </h1>
             <p className="text-lg font-light text-[var(--text-secondary)] max-w-2xl mx-auto">
-              Learn from world-class beauty professionals with years of industry experience
+              {t('pageDescription')}
             </p>
           </div>
 
@@ -50,7 +53,7 @@ export default function EducatorsPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search educators by name or specialty..."
+                placeholder={t('searchPlaceholder')}
                 className="input-premium pl-12"
               />
             </div>
@@ -65,7 +68,7 @@ export default function EducatorsPage() {
                     : 'bg-white border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--champagne)] hover:text-[var(--champagne)]'
                 }`}
               >
-                All Specialties
+                {t('allSpecialties')}
               </button>
               {categories.map((category) => (
                 <button
@@ -85,7 +88,7 @@ export default function EducatorsPage() {
 
           {/* Results Count */}
           <p className="text-sm font-light text-[var(--text-muted)] mb-6 text-center">
-            Showing {filteredEducators.length} educators
+            {t('showingEducators', { count: filteredEducators.length })}
           </p>
 
           {/* Educators Grid */}
@@ -98,7 +101,7 @@ export default function EducatorsPage() {
           ) : (
             <div className="text-center py-20">
               <p className="text-lg font-light text-[var(--text-muted)]">
-                No educators found matching your criteria
+                {t('noEducatorsFound')}
               </p>
               <button
                 onClick={() => {
@@ -107,7 +110,7 @@ export default function EducatorsPage() {
                 }}
                 className="btn-secondary mt-4"
               >
-                Clear Filters
+                {tCommon('clearFilters')}
               </button>
             </div>
           )}
@@ -116,14 +119,13 @@ export default function EducatorsPage() {
           <div className="mt-20 text-center">
             <div className="card-premium p-10 max-w-2xl mx-auto">
               <h2 className="text-2xl font-extralight text-[var(--charcoal)] mb-4">
-                Share Your Expertise
+                {t('shareExpertise')}
               </h2>
               <p className="text-[var(--text-secondary)] font-light mb-6">
-                Are you a beauty professional with knowledge to share? Join our community of
-                educators and reach students worldwide.
+                {t('shareExpertiseDesc')}
               </p>
               <a href="/register" className="btn-primary">
-                Become an Educator
+                {t('becomeEducator')}
               </a>
             </div>
           </div>

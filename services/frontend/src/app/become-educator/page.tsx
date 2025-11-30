@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check, DollarSign, Globe, Users, Calendar, Award, ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getVisibleCategories } from '@/data/categories';
 
 export default function BecomeEducatorPage() {
+  const t = useTranslations('becomeEducator');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -40,15 +42,14 @@ export default function BecomeEducatorPage() {
       <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-white to-[var(--cream)]">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xs font-medium tracking-widest uppercase text-[var(--champagne)] mb-4">
-            Become an Educator
+            {t('sectionLabel')}
           </p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extralight text-[var(--charcoal)] leading-tight mb-6">
-            Share Your Expertise
-            <span className="block text-[var(--champagne)]">With the World</span>
+            {t('heroTitle')}
+            <span className="block text-[var(--champagne)]">{t('heroTitleHighlight')}</span>
           </h1>
           <p className="text-xl font-light text-[var(--text-secondary)] max-w-2xl mx-auto">
-            Join our community of world-class beauty educators and reach students globally
-            through live, interactive classes.
+            {t('heroDescription')}
           </p>
         </div>
       </section>
@@ -58,7 +59,7 @@ export default function BecomeEducatorPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-extralight text-[var(--charcoal)]">
-              Why Teach on Luméra?
+              {t('whyTeach')}
             </h2>
           </div>
 
@@ -67,10 +68,9 @@ export default function BecomeEducatorPage() {
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[var(--beige)] flex items-center justify-center">
                 <Globe className="w-7 h-7 text-[var(--champagne)]" />
               </div>
-              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">Global Reach</h3>
+              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">{t('globalReach')}</h3>
               <p className="text-[var(--text-secondary)] font-light leading-relaxed">
-                Reach students in 50+ countries without leaving your studio. Build an
-                international following and expand your brand globally.
+                {t('globalReachDesc')}
               </p>
             </div>
 
@@ -78,10 +78,9 @@ export default function BecomeEducatorPage() {
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[var(--beige)] flex items-center justify-center">
                 <DollarSign className="w-7 h-7 text-[var(--champagne)]" />
               </div>
-              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">Earn More</h3>
+              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">{t('earnMore')}</h3>
               <p className="text-[var(--text-secondary)] font-light leading-relaxed">
-                Set your own prices and keep up to 80% of your earnings. Our top educators
-                earn $10,000+ monthly through live classes.
+                {t('earnMoreDesc')}
               </p>
             </div>
 
@@ -89,10 +88,9 @@ export default function BecomeEducatorPage() {
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[var(--beige)] flex items-center justify-center">
                 <Calendar className="w-7 h-7 text-[var(--champagne)]" />
               </div>
-              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">Flexible Schedule</h3>
+              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">{t('flexibleSchedule')}</h3>
               <p className="text-[var(--text-secondary)] font-light leading-relaxed">
-                Teach when it works for you. Schedule classes around your existing commitments
-                and work-life balance.
+                {t('flexibleScheduleDesc')}
               </p>
             </div>
           </div>
@@ -104,10 +102,10 @@ export default function BecomeEducatorPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-xs font-medium tracking-widest uppercase text-[var(--champagne)] mb-4">
-              Getting Started
+              {t('gettingStarted')}
             </p>
             <h2 className="text-3xl md:text-4xl font-extralight text-[var(--charcoal)]">
-              How It Works
+              {t('howItWorks')}
             </h2>
           </div>
 
@@ -115,23 +113,23 @@ export default function BecomeEducatorPage() {
             {[
               {
                 step: '01',
-                title: 'Apply',
-                description: 'Submit your application with your credentials and expertise.',
+                title: t('steps.apply'),
+                description: t('steps.applyDesc'),
               },
               {
                 step: '02',
-                title: 'Get Verified',
-                description: 'Our team reviews your application and verifies your qualifications.',
+                title: t('steps.getVerified'),
+                description: t('steps.getVerifiedDesc'),
               },
               {
                 step: '03',
-                title: 'Create Classes',
-                description: 'Set up your live classes with your preferred schedule and pricing.',
+                title: t('steps.createClasses'),
+                description: t('steps.createClassesDesc'),
               },
               {
                 step: '04',
-                title: 'Start Teaching',
-                description: 'Go live and share your knowledge with students worldwide.',
+                title: t('steps.startTeaching'),
+                description: t('steps.startTeachingDesc'),
               },
             ].map((item, index) => (
               <div key={index} className="text-center">
@@ -153,18 +151,18 @@ export default function BecomeEducatorPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extralight text-[var(--charcoal)]">
-              What We Look For
+              {t('whatWeLookFor')}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
-              'Minimum 3 years of professional experience',
-              'Strong portfolio or track record',
-              'Excellent communication skills',
-              'Passion for teaching and mentoring',
-              'Professional certifications in your field',
-              'Commitment to student success',
+              t('requirements.experience'),
+              t('requirements.portfolio'),
+              t('requirements.communication'),
+              t('requirements.passion'),
+              t('requirements.certifications'),
+              t('requirements.commitment'),
             ].map((item, index) => (
               <div key={index} className="flex items-center space-x-3">
                 <div className="w-6 h-6 rounded-full bg-[var(--champagne)]/20 flex items-center justify-center flex-shrink-0">
@@ -182,10 +180,10 @@ export default function BecomeEducatorPage() {
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-xs font-medium tracking-widest uppercase text-[var(--champagne)] mb-4">
-              Apply Now
+              {t('applyNow')}
             </p>
             <h2 className="text-3xl md:text-4xl font-extralight text-[var(--charcoal)]">
-              Start Your Application
+              {t('startApplication')}
             </h2>
           </div>
 
@@ -195,14 +193,13 @@ export default function BecomeEducatorPage() {
                 <Check className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-2xl font-light text-[var(--charcoal)] mb-4">
-                Application Submitted!
+                {t('applicationSubmitted')}
               </h3>
               <p className="text-[var(--text-secondary)] font-light mb-6">
-                Thank you for your interest in becoming a Luméra educator. Our team will review
-                your application and get back to you within 3-5 business days.
+                {t('thankYouApplication')}
               </p>
               <Link href="/" className="btn-primary">
-                Return Home
+                {t('returnHome')}
               </Link>
             </div>
           ) : (
@@ -210,7 +207,7 @@ export default function BecomeEducatorPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                    Full Name *
+                    {t('form.fullName')} *
                   </label>
                   <input
                     type="text"
@@ -222,7 +219,7 @@ export default function BecomeEducatorPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                    Email Address *
+                    {t('form.emailAddress')} *
                   </label>
                   <input
                     type="email"
@@ -237,7 +234,7 @@ export default function BecomeEducatorPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                    Primary Specialty *
+                    {t('form.primarySpecialty')} *
                   </label>
                   <select
                     value={formData.specialty}
@@ -245,7 +242,7 @@ export default function BecomeEducatorPage() {
                     className="input-premium"
                     required
                   >
-                    <option value="">Select specialty</option>
+                    <option value="">{t('form.selectSpecialty')}</option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
@@ -255,7 +252,7 @@ export default function BecomeEducatorPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                    Years of Experience *
+                    {t('form.yearsExperience')} *
                   </label>
                   <select
                     value={formData.experience}
@@ -263,18 +260,18 @@ export default function BecomeEducatorPage() {
                     className="input-premium"
                     required
                   >
-                    <option value="">Select experience</option>
-                    <option value="3-5">3-5 years</option>
-                    <option value="5-10">5-10 years</option>
-                    <option value="10-15">10-15 years</option>
-                    <option value="15+">15+ years</option>
+                    <option value="">{t('form.selectExperience')}</option>
+                    <option value="3-5">{t('form.years35')}</option>
+                    <option value="5-10">{t('form.years510')}</option>
+                    <option value="10-15">{t('form.years1015')}</option>
+                    <option value="15+">{t('form.years15plus')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                  Website or Portfolio URL
+                  {t('form.websiteUrl')}
                 </label>
                 <input
                   type="url"
@@ -287,13 +284,13 @@ export default function BecomeEducatorPage() {
 
               <div>
                 <label className="block text-sm font-light text-[var(--text-secondary)] mb-2">
-                  Tell us about yourself *
+                  {t('form.aboutYou')} *
                 </label>
                 <textarea
                   value={formData.about}
                   onChange={(e) => setFormData({ ...formData, about: e.target.value })}
                   className="input-premium min-h-[150px] resize-none"
-                  placeholder="Share your background, achievements, and why you want to teach on Luméra..."
+                  placeholder={t('form.aboutPlaceholder')}
                   required
                 />
               </div>
@@ -303,7 +300,7 @@ export default function BecomeEducatorPage() {
                 disabled={isSubmitting}
                 className="btn-primary w-full disabled:opacity-50"
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                {isSubmitting ? t('form.submitting') : t('form.submitApplication')}
               </button>
             </form>
           )}
@@ -313,12 +310,12 @@ export default function BecomeEducatorPage() {
       {/* FAQ Preview */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-light text-[var(--charcoal)] mb-6">Have Questions?</h2>
+          <h2 className="text-2xl font-light text-[var(--charcoal)] mb-6">{t('haveQuestions')}</h2>
           <p className="text-[var(--text-secondary)] font-light mb-6">
-            Check our Help Center or reach out to our educator support team.
+            {t('checkHelpCenter')}
           </p>
           <Link href="/help" className="btn-secondary">
-            Visit Help Center
+            {t('visitHelpCenter')}
           </Link>
         </div>
       </section>

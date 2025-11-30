@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Search, ChevronDown, ChevronUp, BookOpen, CreditCard, Video, Award, User, Mail } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
@@ -105,6 +106,7 @@ const faqCategories = [
 ];
 
 export default function HelpPage() {
+  const t = useTranslations('help');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -128,7 +130,7 @@ export default function HelpPage() {
       <section className="pt-32 pb-16 px-6 bg-gradient-to-b from-white to-[var(--cream)]">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-extralight text-[var(--charcoal)] mb-6">
-            How can we help?
+            {t('pageTitle')}
           </h1>
           <div className="relative max-w-xl mx-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]" />
@@ -136,7 +138,7 @@ export default function HelpPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for answers..."
+              placeholder={t('searchPlaceholder')}
               className="input-premium pl-12 text-lg"
             />
           </div>
@@ -155,7 +157,7 @@ export default function HelpPage() {
                   : 'bg-white border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--champagne)]'
               }`}
             >
-              All Topics
+              {t('allTopics')}
             </button>
             {faqCategories.map((category) => (
               <button
@@ -221,7 +223,7 @@ export default function HelpPage() {
           {filteredCategories.every((c) => c.faqs.length === 0) && searchQuery && (
             <div className="text-center py-12">
               <p className="text-[var(--text-muted)] font-light">
-                No results found for &quot;{searchQuery}&quot;
+                {t('noResults', { query: searchQuery })}
               </p>
             </div>
           )}
@@ -232,15 +234,15 @@ export default function HelpPage() {
       <section className="py-16 px-6 bg-[var(--cream)]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl font-light text-[var(--charcoal)] mb-4">
-            Still need help?
+            {t('stillNeedHelp')}
           </h2>
           <p className="text-[var(--text-secondary)] font-light mb-8">
-            Our support team is here to assist you with any questions.
+            {t('supportTeam')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/contact" className="btn-primary flex items-center space-x-2">
               <Mail className="w-4 h-4" />
-              <span>Contact Support</span>
+              <span>{t('contactSupport')}</span>
             </Link>
           </div>
         </div>

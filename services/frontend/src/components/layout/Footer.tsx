@@ -1,7 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { getVisibleCategories } from '@/data/categories';
 
 export default function Footer() {
+  const t = useTranslations('footer');
   const categories = getVisibleCategories();
 
   return (
@@ -13,21 +17,21 @@ export default function Footer() {
             <div>
               <h3 className="text-2xl font-light tracking-tight">Luméra</h3>
               <p className="text-xs font-light tracking-widest uppercase text-white/60">
-                Beauty Academy
+                {t('beautyAcademy')}
               </p>
             </div>
             <p className="text-sm font-light text-white/70 leading-relaxed">
-              Live. Learn. Elevate.
+              {t('tagline')}
             </p>
             <p className="text-sm font-light text-white/50 leading-relaxed">
-              The premier global platform for live beauty education from top educators worldwide.
+              {t('description')}
             </p>
           </div>
 
           {/* Categories */}
           <div>
             <h4 className="text-xs font-medium tracking-widest uppercase text-white/60 mb-4">
-              Categories
+              {t('categories')}
             </h4>
             <ul className="space-y-2">
               {categories.slice(0, 5).map((category) => (
@@ -46,7 +50,7 @@ export default function Footer() {
           {/* Company */}
           <div>
             <h4 className="text-xs font-medium tracking-widest uppercase text-white/60 mb-4">
-              Company
+              {t('company')}
             </h4>
             <ul className="space-y-2">
               <li>
@@ -54,7 +58,7 @@ export default function Footer() {
                   href="/about"
                   className="text-sm font-light text-white/70 hover:text-[var(--champagne)] transition-colors"
                 >
-                  About Us
+                  {t('aboutUs')}
                 </Link>
               </li>
               <li>
@@ -62,7 +66,7 @@ export default function Footer() {
                   href="/become-educator"
                   className="text-sm font-light text-white/70 hover:text-[var(--champagne)] transition-colors"
                 >
-                  Become an Educator
+                  {t('becomeEducator')}
                 </Link>
               </li>
               <li>
@@ -70,7 +74,7 @@ export default function Footer() {
                   href="/careers"
                   className="text-sm font-light text-white/70 hover:text-[var(--champagne)] transition-colors"
                 >
-                  Careers
+                  {t('careers')}
                 </Link>
               </li>
               <li>
@@ -78,7 +82,7 @@ export default function Footer() {
                   href="/press"
                   className="text-sm font-light text-white/70 hover:text-[var(--champagne)] transition-colors"
                 >
-                  Press
+                  {t('press')}
                 </Link>
               </li>
             </ul>
@@ -87,7 +91,7 @@ export default function Footer() {
           {/* Support */}
           <div>
             <h4 className="text-xs font-medium tracking-widest uppercase text-white/60 mb-4">
-              Support
+              {t('support')}
             </h4>
             <ul className="space-y-2">
               <li>
@@ -95,7 +99,7 @@ export default function Footer() {
                   href="/help"
                   className="text-sm font-light text-white/70 hover:text-[var(--champagne)] transition-colors"
                 >
-                  Help Center
+                  {t('helpCenter')}
                 </Link>
               </li>
               <li>
@@ -103,7 +107,7 @@ export default function Footer() {
                   href="/contact"
                   className="text-sm font-light text-white/70 hover:text-[var(--champagne)] transition-colors"
                 >
-                  Contact Us
+                  {t('contactUs')}
                 </Link>
               </li>
               <li>
@@ -111,7 +115,7 @@ export default function Footer() {
                   href="/privacy"
                   className="text-sm font-light text-white/70 hover:text-[var(--champagne)] transition-colors"
                 >
-                  Privacy Policy
+                  {t('privacyPolicy')}
                 </Link>
               </li>
               <li>
@@ -119,7 +123,7 @@ export default function Footer() {
                   href="/terms"
                   className="text-sm font-light text-white/70 hover:text-[var(--champagne)] transition-colors"
                 >
-                  Terms of Service
+                  {t('termsOfService')}
                 </Link>
               </li>
             </ul>
@@ -130,26 +134,26 @@ export default function Footer() {
         <div className="mt-16 pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-xs font-light text-white/40">
-              © {new Date().getFullYear()} Luméra Beauty Academy. All rights reserved.
+              {t('copyright', { year: new Date().getFullYear() })}
             </p>
             <div className="flex items-center space-x-6">
               <Link
                 href="#"
                 className="text-xs font-light text-white/40 hover:text-white/70 transition-colors"
               >
-                Instagram
+                {t('instagram')}
               </Link>
               <Link
                 href="#"
                 className="text-xs font-light text-white/40 hover:text-white/70 transition-colors"
               >
-                LinkedIn
+                {t('linkedin')}
               </Link>
               <Link
                 href="#"
                 className="text-xs font-light text-white/40 hover:text-white/70 transition-colors"
               >
-                YouTube
+                {t('youtube')}
               </Link>
             </div>
           </div>

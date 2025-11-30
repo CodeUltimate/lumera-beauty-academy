@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Calendar, Clock, Users, Radio } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { LiveClass } from '@/types';
 import { formatPrice, formatDate, formatTime, formatDuration, getTimeUntil, getInitials } from '@/lib/utils';
 
@@ -11,6 +12,7 @@ interface LiveClassCardProps {
 }
 
 export default function LiveClassCard({ liveClass, featured = false }: LiveClassCardProps) {
+  const t = useTranslations('ui');
   const isLive = liveClass.status === 'live';
   const spotsLeft = liveClass.maxStudents
     ? liveClass.maxStudents - liveClass.enrolledStudents
@@ -28,7 +30,7 @@ export default function LiveClassCard({ liveClass, featured = false }: LiveClass
             <div className="flex items-center space-x-1.5 live-badge">
               <Radio className="w-3 h-3 text-red-500" />
               <span className="text-[11px] sm:text-xs font-medium text-red-500 uppercase tracking-wider">
-                Live Now
+                {t('liveNow')}
               </span>
             </div>
           )}
@@ -82,7 +84,7 @@ export default function LiveClassCard({ liveClass, featured = false }: LiveClass
             {spotsLeft !== null && spotsLeft <= 10 && (
               <div className="flex items-center space-x-1 text-sm font-light text-[var(--champagne)]">
                 <Users className="w-4 h-4 flex-shrink-0" />
-                <span>{spotsLeft} spots left</span>
+                <span>{t('spotsLeft', { count: spotsLeft })}</span>
               </div>
             )}
           </div>
@@ -96,7 +98,7 @@ export default function LiveClassCard({ liveClass, featured = false }: LiveClass
             </span>
           </div>
           <div className="text-sm font-medium text-[var(--champagne)] group-hover:translate-x-1 transition-transform whitespace-nowrap">
-            {isLive ? 'Join Now' : `Starts in ${getTimeUntil(liveClass.scheduledAt)}`} →
+            {isLive ? t('joinNow') : t('startsIn', { time: getTimeUntil(liveClass.scheduledAt) })} →
           </div>
         </div>
       </div>

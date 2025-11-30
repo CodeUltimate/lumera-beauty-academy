@@ -4,12 +4,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Check, AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/contexts/AuthContext';
 
 type UserType = 'student' | 'educator';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useTranslations('register');
+  const tHeader = useTranslations('header');
+  const tCommon = useTranslations('common');
   const { register: registerUser, isLoading, error, clearError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<UserType>('student');
@@ -53,24 +57,23 @@ export default function RegisterPage() {
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[var(--plum)] to-[var(--plum-light)] items-center justify-center p-12">
         <div className="max-w-lg text-center">
           <h2 className="text-4xl font-extralight text-white mb-6">
-            Start Your Journey
+            {t('startJourney')}
           </h2>
           <p className="text-lg font-light text-white/70 leading-relaxed">
-            Whether you want to learn from the best or share your expertise with the world,
-            Luméra is your platform for growth.
+            {t('journeyDesc')}
           </p>
           <div className="mt-12 space-y-4">
             <div className="flex items-center space-x-3 text-white/80">
               <Check className="w-5 h-5 text-[var(--champagne)]" />
-              <span className="font-light">Access to live masterclasses</span>
+              <span className="font-light">{t('accessLive')}</span>
             </div>
             <div className="flex items-center space-x-3 text-white/80">
               <Check className="w-5 h-5 text-[var(--champagne)]" />
-              <span className="font-light">Verified certificates</span>
+              <span className="font-light">{t('verifiedCerts')}</span>
             </div>
             <div className="flex items-center space-x-3 text-white/80">
               <Check className="w-5 h-5 text-[var(--champagne)]" />
-              <span className="font-light">Global community access</span>
+              <span className="font-light">{t('globalAccess')}</span>
             </div>
           </div>
         </div>
@@ -85,16 +88,16 @@ export default function RegisterPage() {
               Luméra
             </h1>
             <p className="text-xs font-light tracking-widest uppercase text-[var(--text-muted)]">
-              Beauty Academy
+              {tHeader('beautyAcademy')}
             </p>
           </Link>
 
           {/* Heading */}
           <h2 className="text-2xl sm:text-3xl font-extralight text-[var(--charcoal)] mb-2">
-            Create your account
+            {t('createAccount')}
           </h2>
           <p className="text-[var(--text-secondary)] font-light mb-6 sm:mb-8">
-            Join the premier beauty education platform
+            {t('joinPlatform')}
           </p>
 
           {/* User Type Toggle - 44px touch targets */}
@@ -108,7 +111,7 @@ export default function RegisterPage() {
                   : 'text-[var(--text-muted)]'
               }`}
             >
-              I want to learn
+              {t('wantToLearn')}
             </button>
             <button
               type="button"
@@ -119,7 +122,7 @@ export default function RegisterPage() {
                   : 'text-[var(--text-muted)]'
               }`}
             >
-              I want to teach
+              {t('wantToTeach')}
             </button>
           </div>
 
@@ -136,14 +139,14 @@ export default function RegisterPage() {
             {/* Name */}
             <div>
               <label className="block text-sm font-light text-[var(--text-secondary)] mb-1.5 sm:mb-2">
-                Full Name
+                {t('fullName')}
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="input-premium"
-                placeholder="Enter your full name"
+                placeholder={t('fullNamePlaceholder')}
                 required
               />
             </div>
@@ -151,7 +154,7 @@ export default function RegisterPage() {
             {/* Email */}
             <div>
               <label className="block text-sm font-light text-[var(--text-secondary)] mb-1.5 sm:mb-2">
-                Email Address
+                {t('emailAddress')}
               </label>
               <input
                 type="email"
@@ -167,7 +170,7 @@ export default function RegisterPage() {
             {userType === 'educator' && (
               <div>
                 <label className="block text-sm font-light text-[var(--text-secondary)] mb-1.5 sm:mb-2">
-                  Primary Specialty
+                  {t('primarySpecialty')}
                 </label>
                 <select
                   value={formData.specialty}
@@ -175,14 +178,14 @@ export default function RegisterPage() {
                   className="select-premium"
                   required
                 >
-                  <option value="">Select your specialty</option>
-                  <option value="skincare">Skincare</option>
-                  <option value="laser-devices">Laser & Devices</option>
-                  <option value="brow-lash">Brow & Lash</option>
-                  <option value="pmu">PMU</option>
-                  <option value="aesthetics-needle">Aesthetics (Needle)</option>
-                  <option value="needle-free-aesthetics">Needle-Free Aesthetics</option>
-                  <option value="beauty-business">Beauty Business & Marketing</option>
+                  <option value="">{t('selectSpecialty')}</option>
+                  <option value="skincare">{t('specialties.skincare')}</option>
+                  <option value="laser-devices">{t('specialties.laser')}</option>
+                  <option value="brow-lash">{t('specialties.browLash')}</option>
+                  <option value="pmu">{t('specialties.pmu')}</option>
+                  <option value="aesthetics-needle">{t('specialties.aestheticsNeedle')}</option>
+                  <option value="needle-free-aesthetics">{t('specialties.needleFree')}</option>
+                  <option value="beauty-business">{t('specialties.business')}</option>
                 </select>
               </div>
             )}
@@ -198,7 +201,7 @@ export default function RegisterPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="input-premium pr-14"
-                  placeholder="Create a password"
+                  placeholder={t('fullNamePlaceholder')}
                   required
                   minLength={8}
                 />
@@ -206,13 +209,13 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-0 top-0 h-full w-12 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--charcoal)] transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('hidePassword') : t('showPassword')}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               <p className="text-xs font-light text-[var(--text-muted)] mt-1">
-                Minimum 8 characters
+                {t('minChars')}
               </p>
             </div>
 
@@ -233,13 +236,13 @@ export default function RegisterPage() {
                 {agreed && <Check className="w-4 h-4 text-white" />}
               </button>
               <p className="text-sm font-light text-[var(--text-secondary)]">
-                I agree to the{' '}
+                {t('agreeTerms')}{' '}
                 <Link href="/terms" className="text-[var(--champagne)] hover:underline">
-                  Terms of Service
+                  {t('termsOfService')}
                 </Link>{' '}
-                and{' '}
+                {t('and')}{' '}
                 <Link href="/privacy" className="text-[var(--champagne)] hover:underline">
-                  Privacy Policy
+                  {t('privacyPolicy')}
                 </Link>
               </p>
             </div>
@@ -250,15 +253,15 @@ export default function RegisterPage() {
               disabled={isLoading || !agreed}
               className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? t('creatingAccount') : t('createAccountBtn')}
             </button>
           </form>
 
           {/* Login Link */}
           <p className="text-center text-sm font-light text-[var(--text-secondary)] mt-6 sm:mt-8">
-            Already have an account?{' '}
+            {t('alreadyHaveAccount')}{' '}
             <Link href="/login" className="text-[var(--champagne)] hover:underline">
-              Sign in
+              {tCommon('signIn')}
             </Link>
           </p>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Category } from '@/types';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -16,6 +17,7 @@ export default function CategoryFilter({
   selectedCategory,
   onSelect,
 }: CategoryFilterProps) {
+  const t = useTranslations('common');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
@@ -92,7 +94,7 @@ export default function CategoryFilter({
           className={buttonClasses(selectedCategory === null)}
           style={{ scrollSnapAlign: 'start' }}
         >
-          All
+          {t('all')}
         </button>
         {categories.map((category) => (
           <button

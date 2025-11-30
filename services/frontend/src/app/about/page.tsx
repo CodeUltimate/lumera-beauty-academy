@@ -1,9 +1,14 @@
+'use client';
+
 import Link from 'next/link';
 import { Globe, Award, Users, Heart, Target, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 export default function AboutPage() {
+  const t = useTranslations('about');
+
   return (
     <main className="min-h-screen bg-[var(--cream-light)]">
       <Header />
@@ -12,15 +17,13 @@ export default function AboutPage() {
       <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-white to-[var(--cream)]">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xs font-medium tracking-widest uppercase text-[var(--champagne)] mb-4">
-            About Us
+            {t('sectionLabel')}
           </p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extralight text-[var(--charcoal)] leading-tight mb-6">
-            Elevating Beauty Education
-            <span className="block text-[var(--champagne)]">Worldwide</span>
+            {t('mainHeading')}
           </h1>
           <p className="text-xl font-light text-[var(--text-secondary)] max-w-2xl mx-auto">
-            Luméra Beauty Academy is the premier global platform connecting beauty professionals
-            with world-class educators through live, interactive learning experiences.
+            {t('mainDescription')}
           </p>
         </div>
       </section>
@@ -31,38 +34,34 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <p className="text-xs font-medium tracking-widest uppercase text-[var(--champagne)] mb-4">
-                Our Mission
+                {t('missionLabel')}
               </p>
               <h2 className="text-3xl md:text-4xl font-extralight text-[var(--charcoal)] mb-6">
-                Democratizing Access to Premium Beauty Education
+                {t('missionTitle')}
               </h2>
               <p className="text-[var(--text-secondary)] font-light leading-relaxed mb-6">
-                We believe that geography should never be a barrier to excellence. Our platform
-                bridges the gap between aspiring beauty professionals and the industry&apos;s most
-                accomplished educators, regardless of where they are in the world.
+                {t('missionDesc1')}
               </p>
               <p className="text-[var(--text-secondary)] font-light leading-relaxed">
-                Through live, interactive sessions, we create an immersive learning environment
-                that goes beyond traditional online courses. Real-time feedback, Q&A sessions,
-                and hands-on demonstrations bring the classroom experience directly to you.
+                {t('missionDesc2')}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="card-premium p-6 text-center">
                 <p className="text-4xl font-extralight text-[var(--champagne)] mb-2">10K+</p>
-                <p className="text-sm font-light text-[var(--text-muted)]">Students Worldwide</p>
+                <p className="text-sm font-light text-[var(--text-muted)]">{t('studentsWorldwide')}</p>
               </div>
               <div className="card-premium p-6 text-center">
                 <p className="text-4xl font-extralight text-[var(--champagne)] mb-2">500+</p>
-                <p className="text-sm font-light text-[var(--text-muted)]">Expert Educators</p>
+                <p className="text-sm font-light text-[var(--text-muted)]">{t('expertEducators')}</p>
               </div>
               <div className="card-premium p-6 text-center">
                 <p className="text-4xl font-extralight text-[var(--champagne)] mb-2">50+</p>
-                <p className="text-sm font-light text-[var(--text-muted)]">Countries</p>
+                <p className="text-sm font-light text-[var(--text-muted)]">{t('countries')}</p>
               </div>
               <div className="card-premium p-6 text-center">
                 <p className="text-4xl font-extralight text-[var(--champagne)] mb-2">2K+</p>
-                <p className="text-sm font-light text-[var(--text-muted)]">Live Classes</p>
+                <p className="text-sm font-light text-[var(--text-muted)]">{t('liveClassesCount')}</p>
               </div>
             </div>
           </div>
@@ -74,10 +73,10 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-xs font-medium tracking-widest uppercase text-[var(--champagne)] mb-4">
-              Our Values
+              {t('valuesLabel')}
             </p>
             <h2 className="text-3xl md:text-4xl font-extralight text-[var(--charcoal)]">
-              What We Stand For
+              {t('valuesTitle')}
             </h2>
           </div>
 
@@ -86,10 +85,9 @@ export default function AboutPage() {
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-white flex items-center justify-center">
                 <Sparkles className="w-7 h-7 text-[var(--champagne)]" />
               </div>
-              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">Excellence</h3>
+              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">{t('excellence')}</h3>
               <p className="text-[var(--text-secondary)] font-light leading-relaxed">
-                We curate only the finest educators and maintain the highest standards
-                in beauty education.
+                {t('excellenceDesc')}
               </p>
             </div>
 
@@ -97,10 +95,9 @@ export default function AboutPage() {
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-white flex items-center justify-center">
                 <Globe className="w-7 h-7 text-[var(--champagne)]" />
               </div>
-              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">Accessibility</h3>
+              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">{t('accessibility')}</h3>
               <p className="text-[var(--text-secondary)] font-light leading-relaxed">
-                Premium education should be accessible to beauty professionals everywhere,
-                at any stage of their career.
+                {t('accessibilityDesc')}
               </p>
             </div>
 
@@ -108,10 +105,9 @@ export default function AboutPage() {
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-white flex items-center justify-center">
                 <Heart className="w-7 h-7 text-[var(--champagne)]" />
               </div>
-              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">Community</h3>
+              <h3 className="text-xl font-light text-[var(--charcoal)] mb-3">{t('community')}</h3>
               <p className="text-[var(--text-secondary)] font-light leading-relaxed">
-                We foster a supportive global community where professionals learn,
-                grow, and inspire each other.
+                {t('communityDesc')}
               </p>
             </div>
           </div>
@@ -123,10 +119,10 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-xs font-medium tracking-widest uppercase text-[var(--champagne)] mb-4">
-              Our Story
+              {t('storyLabel')}
             </p>
             <h2 className="text-3xl md:text-4xl font-extralight text-[var(--charcoal)]">
-              How Luméra Began
+              {t('storyTitle')}
             </h2>
           </div>
 
@@ -156,20 +152,20 @@ export default function AboutPage() {
       <section className="py-24 px-6 bg-[var(--plum)]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-extralight text-white mb-6">
-            Join the Luméra Community
+            {t('ctaTitle')}
           </h2>
           <p className="text-lg font-light text-white/70 max-w-2xl mx-auto mb-10">
-            Whether you&apos;re looking to learn or to teach, there&apos;s a place for you here.
+            {t('ctaDesc')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/register" className="btn-primary">
-              Start Learning
+              {t('startLearning')}
             </Link>
             <Link
               href="/become-educator"
               className="btn-secondary bg-transparent border-white/30 text-white hover:bg-white/10"
             >
-              Become an Educator
+              {t('becomeEducator')}
             </Link>
           </div>
         </div>

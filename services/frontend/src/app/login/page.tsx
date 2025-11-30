@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Helper to get dashboard path based on user role
@@ -20,6 +21,9 @@ function getDashboardPath(role: string | undefined): string {
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('auth');
+  const tHeader = useTranslations('header');
+  const tCommon = useTranslations('common');
   const { user, isAuthenticated, isLoading } = useAuth();
   const hasRedirected = useRef(false);
 
@@ -70,22 +74,22 @@ function LoginContent() {
             Luméra
           </h1>
           <p className="text-xs font-light tracking-widest uppercase text-[var(--text-muted)] mb-8">
-            Beauty Academy
+            {tHeader('beautyAcademy')}
           </p>
           <div className="bg-red-50 border border-red-200 rounded-sm p-4 mb-6">
             <p className="text-sm text-red-700">
               {error === 'access_denied'
-                ? 'Login was cancelled or access was denied.'
+                ? t('loginCancelled')
                 : error === 'invalid_callback'
-                ? 'There was a problem with the login process.'
-                : `Authentication error: ${error}`}
+                ? t('loginProblem')
+                : t('authError', { error })}
             </p>
           </div>
           <button
             onClick={handleRetry}
             className="btn-primary w-full"
           >
-            Try Again
+            {tCommon('tryAgain')}
           </button>
         </div>
       </main>
@@ -100,7 +104,7 @@ function LoginContent() {
           Luméra
         </h1>
         <p className="text-xs font-light tracking-widest uppercase text-[var(--text-muted)] mb-8">
-          Beauty Academy
+          {tHeader('beautyAcademy')}
         </p>
         <div className="flex items-center justify-center space-x-2 text-[var(--text-secondary)]">
           <svg
@@ -123,7 +127,7 @@ function LoginContent() {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          <span className="text-sm font-light">Redirecting to secure login...</span>
+          <span className="text-sm font-light">{t('redirecting')}</span>
         </div>
       </div>
     </main>

@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { Star, Users, BookOpen, CheckCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Educator } from '@/types';
 import { getInitials } from '@/lib/utils';
 
@@ -8,6 +11,7 @@ interface EducatorCardProps {
 }
 
 export default function EducatorCard({ educator }: EducatorCardProps) {
+  const t = useTranslations('ui');
   return (
     <Link href={`/educator/${educator.id}`}>
       <div className="card-premium p-6 text-center group cursor-pointer">
@@ -50,7 +54,7 @@ export default function EducatorCard({ educator }: EducatorCardProps) {
           <div className="flex items-center space-x-1.5">
             <BookOpen className="w-4 h-4 text-[var(--text-muted)]" />
             <span className="text-sm font-light text-[var(--text-secondary)]">
-              {educator.totalClasses} classes
+              {t('classCount', { count: educator.totalClasses })}
             </span>
           </div>
         </div>
