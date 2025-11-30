@@ -491,7 +491,9 @@ resource "aws_ecs_task_definition" "frontend" {
     }]
 
     environment = [
-      { name = "NEXT_PUBLIC_API_URL", value = "http://${aws_lb.main.dns_name}/api" }
+      { name = "NEXT_PUBLIC_API_URL", value = "http://${aws_lb.main.dns_name}/api" },
+      # Override Fargate's HOSTNAME to bind to all interfaces (required for health checks)
+      { name = "HOSTNAME", value = "0.0.0.0" }
     ]
 
     logConfiguration = {
