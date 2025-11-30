@@ -21,7 +21,8 @@ import { formatPrice } from '@/lib/utils';
 export default function AdminDashboard() {
   const [categories, setCategories] = useState(getAllCategories());
 
-  const pendingEducators = mockEducators.filter((e) => !e.verified).slice(0, 3);
+  // Pending educators for future use
+  const _pendingEducators = mockEducators.filter((e) => !e.verified).slice(0, 3);
   const stats = {
     totalUsers: 12847,
     totalEducators: 523,

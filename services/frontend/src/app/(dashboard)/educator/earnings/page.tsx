@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Calendar, Download, ArrowUpRight, ArrowDownRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Calendar, Download, ArrowUpRight, Loader2 } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { classesApi } from '@/lib/api';
 import { formatPrice, formatDate } from '@/lib/utils';

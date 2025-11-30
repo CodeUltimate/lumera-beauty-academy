@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -34,14 +34,16 @@ export default function ClassroomPage() {
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [isParticipantsOpen, setIsParticipantsOpen] = useState(false);
   const [messageInput, setMessageInput] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([
+
+  // Use static timestamps for mock data - these represent messages from a few minutes ago
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
       id: '1',
       classId,
       userId: 'user-1',
       userName: 'Sarah Mitchell',
       message: 'Hello everyone! Excited for this class.',
-      timestamp: new Date(Date.now() - 5 * 60000),
+      timestamp: new Date('2024-11-30T14:00:00'),
       isQuestion: false,
     },
     {
@@ -50,7 +52,7 @@ export default function ClassroomPage() {
       userId: 'user-2',
       userName: 'Jennifer Park',
       message: 'Can you explain the difference between Russian and classic technique?',
-      timestamp: new Date(Date.now() - 3 * 60000),
+      timestamp: new Date('2024-11-30T14:02:00'),
       isQuestion: true,
     },
     {
@@ -59,7 +61,7 @@ export default function ClassroomPage() {
       userId: 'edu-1',
       userName: liveClass.educator.name,
       message: 'Great question Jennifer! I will cover that in detail in the next segment.',
-      timestamp: new Date(Date.now() - 2 * 60000),
+      timestamp: new Date('2024-11-30T14:03:00'),
       isQuestion: false,
     },
   ]);

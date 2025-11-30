@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import {
   Plus, Pencil, Eye, EyeOff, Loader2, Search, AlertCircle,
-  Check, X, Layers, ChevronLeft, ChevronRight, Filter, ChevronDown
+  Check, X, ChevronLeft, ChevronRight, Filter, ChevronDown
 } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { classesApi, Category, CreateCategoryRequest, UpdateCategoryRequest } from '@/lib/api/classes';

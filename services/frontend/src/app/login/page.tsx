@@ -22,15 +22,14 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const { user, isAuthenticated, isLoading } = useAuth();
   const hasRedirected = useRef(false);
-  const [error, setError] = useState<string | null>(null);
+
+  // Check for error in URL params - derived state, not effect-based
+  const errorParam = searchParams.get('error');
+  const [error, setError] = useState<string | null>(errorParam);
 
   useEffect(() => {
-    // Check for error in URL params (from failed OAuth callback)
-    const errorParam = searchParams.get('error');
-    if (errorParam) {
-      setError(errorParam);
-      return; // Don't auto-redirect if there's an error
-    }
+    // If there's an error, don't auto-redirect
+    if (error) return;
 
     // Prevent double redirects
     if (hasRedirected.current) return;
@@ -51,7 +50,7 @@ function LoginContent() {
     hasRedirected.current = true;
     const redirectUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/v1/auth/login?redirect=${encodeURIComponent('/login')}`;
     window.location.href = redirectUrl;
-  }, [user, isAuthenticated, isLoading, router, searchParams]);
+  }, [user, isAuthenticated, isLoading, router, error]);
 
   const handleRetry = () => {
     setError(null);

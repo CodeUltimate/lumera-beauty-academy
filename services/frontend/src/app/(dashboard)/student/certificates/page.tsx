@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Download, Search, Award } from 'lucide-react';
+import { ArrowLeft, Search, Award } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import CertificatePreview from '@/components/ui/CertificatePreview';
 import { Certificate } from '@/types';
-import { formatDate, generateCertificateId } from '@/lib/utils';
+// Utils imported if needed in future
 
 // Mock certificates data
 const mockCertificates: Certificate[] = [
@@ -69,7 +69,7 @@ const mockCertificates: Certificate[] = [
 
 export default function CertificatesPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
+  const [, setSelectedCertificate] = useState<Certificate | null>(null);
 
   const filteredCertificates = mockCertificates.filter(
     (cert) =>

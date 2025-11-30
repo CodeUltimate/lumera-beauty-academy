@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Search, Mail, Award, MoreVertical, Loader2, AlertCircle, Users } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { classesApi, StudentSummary, ApiError } from '@/lib/api';
@@ -120,9 +121,11 @@ export default function EducatorStudentsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
                           {student.avatarUrl ? (
-                            <img
+                            <Image
                               src={student.avatarUrl}
                               alt={student.name}
+                              width={40}
+                              height={40}
                               className="w-10 h-10 rounded-full object-cover"
                             />
                           ) : (

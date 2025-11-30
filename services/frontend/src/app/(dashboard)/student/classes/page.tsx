@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, Radio, Search, Filter } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Radio, Search } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { mockLiveClasses } from '@/data/mockData';
 import { formatDate, formatTime, formatDuration, getTimeUntil } from '@/lib/utils';

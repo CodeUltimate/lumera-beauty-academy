@@ -12,12 +12,14 @@ function VerifyEmailContent() {
   const router = useRouter();
   const token = searchParams.get('token');
 
-  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'no-token'>('loading');
+  // Initialize status based on token presence - derived state
+  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'no-token'>(
+    token ? 'loading' : 'no-token'
+  );
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (!token) {
-      setStatus('no-token');
+    if (!token || status === 'no-token') {
       return;
     }
 
@@ -47,7 +49,7 @@ function VerifyEmailContent() {
     };
 
     verifyEmail();
-  }, [token, router]);
+  }, [token, router, status]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[var(--cream)] to-white flex items-center justify-center px-4">
