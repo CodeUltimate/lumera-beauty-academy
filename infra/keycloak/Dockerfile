@@ -5,33 +5,27 @@ ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 ENV KC_DB=postgres
 
-# Copy custom theme
-COPY theme/lumera /opt/keycloak/themes/lumera
-
-# Copy realm export for import with proper permissions
-COPY --chown=keycloak:keycloak realm-export.json /opt/keycloak/data/import/realm-export.json
-
 WORKDIR /opt/keycloak
 
-# Build optimized Keycloak
+# Build optimized Keycloak (without custom theme - theme loaded at runtime)
 RUN /opt/keycloak/bin/kc.sh build
 
 FROM quay.io/keycloak/keycloak:24.0
 
+# Copy optimized Keycloak from builder
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
-# Copy custom theme with proper ownership
+# Copy custom theme with proper ownership (only in final image)
 COPY --chown=keycloak:keycloak theme/lumera /opt/keycloak/themes/lumera
+COPY --chown=keycloak:keycloak realm-export.json /opt/keycloak/data/import/realm-export.json
 
-# Ensure proper permissions for all files
+# Ensure proper directory structure and permissions
 USER root
 RUN mkdir -p /opt/keycloak/data/import && \
     chown -R keycloak:keycloak /opt/keycloak/data && \
+    chown -R keycloak:keycloak /opt/keycloak/themes/lumera && \
     chmod -R 755 /opt/keycloak/themes/lumera && \
-    find /opt/keycloak/themes/lumera -type f -name "*.ftl" -exec chmod 644 {} \; && \
-    find /opt/keycloak/themes/lumera -type f -name "*.css" -exec chmod 644 {} \; && \
-    find /opt/keycloak/themes/lumera -type f -name "*.properties" -exec chmod 644 {} \; && \
-    ls -laR /opt/keycloak/themes/lumera
+    find /opt/keycloak/themes/lumera -type f -exec chmod 644 {} \;
 USER keycloak
 
 # Set environment variables for startup

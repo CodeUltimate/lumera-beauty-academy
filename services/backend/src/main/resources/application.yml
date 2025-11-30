@@ -52,7 +52,7 @@ app:
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
   auth:
-    enabled: ${AUTH_ENABLED:false}
+    enabled: false  # Use APP_AUTH_ENABLED env var to enable
     cookie:
       access-name: lumera_at
       refresh-name: lumera_rt
@@ -67,6 +67,16 @@ app:
     allowed-types: image/jpeg,image/png,image/webp,video/mp4
   platform:
     fee-percentage: 20
+
+# Keycloak Configuration (overridden by KEYCLOAK_* env vars)
+keycloak:
+  url: http://localhost:8180
+  external-url: http://localhost:8180
+  realm: lumera
+  client-id: lumera-backend
+  client-secret: backend-secret
+  frontend-client-id: lumera-frontend
+  redirect-uri: http://localhost:8080/api/v1/auth/callback
 
 # Actuator
 management:
